@@ -1,5 +1,7 @@
 from django import forms
 from .models import Product
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
 
 class SearchForm(forms.Form):
     query = forms.CharField(
@@ -18,7 +20,7 @@ class SearchForm(forms.Form):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price', 'category']
+        fields = ['name', 'description', 'price', 'category', 'image']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': '商品名を入力'}),
             'description': forms.Textarea(attrs={'placeholder': '商品の説明を入力', 'rows': 4}),
@@ -37,3 +39,9 @@ class ProductForm(forms.ModelForm):
         if price <= 0:  # 価格が0円以下の場合エラー
             raise forms.ValidationError('価格は0円以上でなければなりません。')
         return price
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    class Meta:
+        model = User
+        fields = ('old_password', 'new_password1', 'new_password2')
+        
