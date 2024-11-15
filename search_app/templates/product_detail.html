@@ -18,19 +18,24 @@
                     {% if product.image %}
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid" />
                     {% else %}
-                        <p>画像がありません。</p> <!-- 画像がない場合の代替メッセージ -->
+                        <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="img-thumbnail">
                     {% endif %}
                     
                     <p class="card-text">{{ product.description }}</p>
                     <p class="card-text"><strong>{{ product.price|floatformat:0|intcomma }}円</strong></p>
                     
+                    <!-- お気に入り数の表示 -->
+                    <p class="card-text"><strong>お気に入り数: {{ favorites_count }}</strong></p>
+                    
                     <!-- ボタンの配置 -->
                     <div class="d-flex justify-content-between mt-4">
-                        <a href="{% url 'product_update' product.pk %}" class="btn btn-secondary">編集</a>
+                        <form action="{% url 'product_update' product.pk %}" method="GET" style="display:inline;">
+                            <button type="submit" class="btn btn-secondary">編集</button>
+                        </form>
+                        
                         <form action="{% url 'product_delete' product.pk %}" method="GET" style="display:inline;">
                             <button type="submit" class="btn btn-danger">削除</button>
                         </form>
-                        <a href="{% url 'search_view' %}" class="btn btn-primary">商品一覧に戻る</a>
 
                         <!-- お気に入り追加・解除ボタン -->
                         {% if user.is_authenticated %}  <!-- ログインしているか確認 -->
@@ -40,6 +45,9 @@
                                 {% if product.id in favorites %}お気に入り解除{% else %}お気に入り追加{% endif %}
                             </button>
                         </form>
+
+                        <a href="{% url 'search_view' %}" class="btn btn-primary">商品一覧に戻る</a>
+
                         {% endif %}
                     </div>
                 </div>

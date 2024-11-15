@@ -10,13 +10,16 @@ from django.contrib import messages
 from .forms import CustomPasswordChangeForm
 from django.http import JsonResponse
 from decimal import Decimal
+from django.db.models import Count
 
 def product_create(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)  # request.FILES で画像を取得
+        form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('search_view')
+        else:
+            print("フォームエラー:", form.errors)  # フォームエラーを出力
     else:
         form = ProductForm()
     return render(request, 'product_form.html', {'form': form})
@@ -26,6 +29,9 @@ def product_detail(request, pk):
     
     # ユーザーのお気に入りを取得
     favorites = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True) if request.user.is_authenticated else []
+
+    # 商品のお気に入り数を全ユーザーでカウント
+    favorites_count = Favorite.objects.filter(product=product).count()
 
     # 同じカテゴリの商品を取得（検索商品は除外）
     same_category_products = Product.objects.filter(
@@ -44,6 +50,7 @@ def product_detail(request, pk):
     context = {
         'product': product,
         'favorites': favorites,
+        'favorites_count': favorites_count,
         'same_category_products': same_category_products,
         'similar_price_products': similar_price_products,
     }
@@ -53,7 +60,7 @@ def product_detail(request, pk):
 def product_update(request, pk):
     product = get_object_or_404(Product, pk=pk)
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product)  # request.FILES を追加
         if form.is_valid():
             form.save()
             return redirect('product_detail', pk=product.pk)
@@ -116,6 +123,8 @@ def search_view(request):
         results = results.order_by('price')
     elif sort_by == 'price_desc':
         results = results.order_by('-price')
+    elif sort_by == 'popularity':  # 人気順の並び替え
+        results = results.order_by('-favorite_count')  # 仮にfavorite_countフィールドが人気を表すとする
     else:  # デフォルトの並び替え（名前順）
         results = results.order_by('name')
 
@@ -123,6 +132,12 @@ def search_view(request):
     paginator = Paginator(results, 10)  # 1ページあたりのアイテム数
     page_number = request.GET.get('page', 1)  # デフォルトは1ページ目
     page_obj = paginator.get_page(page_number)
+
+    # 人気ランキング用（お気に入り数が多いTOP3の商品を取得）
+    popular_products = (
+        Product.objects.annotate(favorites_count=Count('favorite'))
+        .order_by('-favorites_count')[:3]
+    )
 
     # テンプレートへのコンテキスト渡し
     context = {
@@ -133,6 +148,7 @@ def search_view(request):
         'min_price': min_price,
         'max_price': max_price,
         'sort_by': sort_by,
+        'popular_products': popular_products,  # 人気ランキング用のコンテキスト
     }
 
     return render(request, 'search.html', context)
