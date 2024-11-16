@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Category, Favorite
+from .models import Product, Category, Favorite, SearchHistory
 from .forms import ProductForm, SearchForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
@@ -124,9 +124,35 @@ def search_view(request):
     elif sort_by == 'price_desc':
         results = results.order_by('-price')
     elif sort_by == 'popularity':  # 人気順の並び替え
-        results = results.order_by('-favorite_count')  # 仮にfavorite_countフィールドが人気を表すとする
+        results = results.annotate(favorites_count=Count('favorite')).order_by('-favorites_count')  # 仮にfavorite_countフィールドが人気を表すとする
     else:  # デフォルトの並び替え（名前順）
         results = results.order_by('name')
+
+    # 検索履歴の保存
+    if request.user.is_authenticated and (query or category_name or min_price or max_price):
+        # 最新3件の履歴を確認して重複しないかをチェック
+        existing_history = SearchHistory.objects.filter(
+            user=request.user,
+            query=query,
+            category_name=category_name,
+            min_price=min_price or None,
+            max_price=max_price or None
+        ).order_by('-id')[:3].exists()  # 最新の3件だけを確認
+        
+        # 同じ条件がなければ新たに履歴を追加
+        if not existing_history:
+            SearchHistory.objects.create(
+                user=request.user,
+                query=query,
+                category_name=category_name,
+                min_price=min_price or None,
+                max_price=max_price or None
+            )
+
+    # 過去の検索履歴を取得（最新3件）
+    search_histories = []
+    if request.user.is_authenticated:
+        search_histories = SearchHistory.objects.filter(user=request.user).order_by('-id')[:3]
 
     # ページネーション
     paginator = Paginator(results, 10)  # 1ページあたりのアイテム数
@@ -149,6 +175,7 @@ def search_view(request):
         'max_price': max_price,
         'sort_by': sort_by,
         'popular_products': popular_products,  # 人気ランキング用のコンテキスト
+        'search_histories': search_histories,  # 検索履歴
     }
 
     return render(request, 'search.html', context)
@@ -193,5 +220,25 @@ def toggle_favorite(request, product_id):
 
 @login_required
 def favorites_list(request):
+    sort_by = request.GET.get('sort', 'name')
+
     favorites = Favorite.objects.filter(user=request.user).select_related('product')
+
+    if sort_by == 'price_asc':
+        favorites = favorites.order_by('product__price')
+    elif sort_by == 'price_desc':
+        favorites = favorites.order_by('-product__price')
+    elif sort_by == 'popularity':  # 人気順
+        favorites = favorites.annotate(favorites_count=Count('product__favorite')).order_by('-favorites_count')
+    else:
+        favorites = favorites.order_by('product__name')
+
     return render(request, 'favorites_list.html', {'favorites': favorites})
+
+def product_view(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    context = {
+        'product': product
+    }
+    return render(request, 'product_detail.html', context)

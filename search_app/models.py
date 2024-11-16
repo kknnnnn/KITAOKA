@@ -33,3 +33,14 @@ class Favorite(models.Model):
     class Meta:
         unique_together = ('user', 'product')  # ユーザーごとに重複しないようにする
         
+class SearchHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # ユーザーごとに検索履歴を保存
+    query = models.CharField(max_length=255, blank=True)  # 検索キーワード
+    category_name = models.CharField(max_length=255, blank=True)  # カテゴリ名
+    min_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 最小価格
+    max_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 最大価格
+    created_at = models.DateTimeField(auto_now_add=True)  # 検索日時
+
+    class Meta:
+        ordering = ['-created_at']  # 最新順
+        

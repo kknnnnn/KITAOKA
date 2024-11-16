@@ -13,3 +13,17 @@
 body {
     padding-top: 80px; /* ナビゲーションバーの高さ分だけ余白を追加 */
 }
+
+.cart {
+    width: 40px;
+    height: auto;
+}
+
+#resetButton a {
+    text-decoration: none;
+}
+
+footer {
+    background-color: magenta;
+    text-align: center;
+}

@@ -55,19 +55,29 @@
         </div>
     </div>
 
+    <!-- 同じカテゴリの商品 -->
     <h2>同じカテゴリの商品</h2>
-    <ul>
-        {% for item in same_category_products %}
-            <li>{{ item.name }} - {{ item.price }}</li>
-        {% endfor %}
-    </ul>
+    {% if same_category_products %}
+        <ul>
+            {% for item in same_category_products %}
+                <li>{{ item.name }} - {{ item.price }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>同じカテゴリの商品はありません。</p>
+    {% endif %}
 
+    <!-- 似た価格帯の商品 -->
     <h2>似た価格帯の商品</h2>
-    <ul>
-        {% for item in similar_price_products %}
-            <li>{{ item.name }} - {{ item.price }}</li>
-        {% endfor %}
-    </ul>
+    {% if similar_price_products %}
+        <ul>
+            {% for item in similar_price_products %}
+                <li>{{ item.name }} - {{ item.price }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>似た価格帯の商品はありません。</p>
+    {% endif %}
 </div>
 
 {% endblock %}

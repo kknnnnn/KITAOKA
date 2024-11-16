@@ -8,7 +8,9 @@
     <form method="POST">
         {% csrf_token %}
         <button type="submit" class="btn btn-danger">削除</button>
-        <a href="{% url 'product_detail' product.pk %}" class="btn btn-secondary">キャンセル</a>
+        <form action="{% url 'product_detail' product.pk %}" method="GET" style="display:inline;">
+            <button type="submit" class="btn btn-secondary">キャンセル</button>
+        </form>
     </form>
 </div>
 

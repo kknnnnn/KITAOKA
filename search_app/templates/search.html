@@ -21,6 +21,23 @@
         {% endfor %}
     </ul>
 
+    {% if user.is_authenticated %}
+        <h3>過去の検索履歴</h3>
+        {% if search_histories %}
+            <ul>
+                {% for history in search_histories %}
+                    <li>
+                        <a href="{% url 'search_view' %}?query={{ history.query }}&category={{ history.category_name }}&min_price={{ history.min_price }}&max_price={{ history.max_price }}">
+                            {{ history.created_at|date:"Y年m月d日 H:i" }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>過去の検索履歴はありません。</p>
+        {% endif %}
+    {% endif %}
+
     <!-- 検索フォーム -->
     <form method="get" class="mb-4" id="searchForm">
         {{ form.as_p }}
@@ -42,27 +59,29 @@
             <label for="max_price" class="form-label">最高価格:</label>
             <input type="number" name="max_price" id="max_price" min="0" class="form-control" value="{{ max_price }}">
         </div>
-        <!-- 並び替えの選択 -->
-        <div class="mb-3">
-            <label for="sort" class="form-label">並び替え:</label>
-            <select name="sort" id="sort" class="form-select">
-                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>名前順</option>
-                <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>価格が安い順</option>
-                <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>価格が高い順</option>
-            </select>
-        </div>
+
         <!-- 検索ボタンとリセットボタン -->
         <div class="d-flex">
             <button type="submit" class="btn btn-primary me-2">検索</button>
             <button type="button" class="btn btn-secondary" id="resetButton">リセット</button>
         </div>
-    </form>
 
     <!-- データ新規入力ボタン -->
     <a href="{% url 'product_create' %}" class="btn btn-success mt-3">データの新規入力</a>
 
-    <!-- 検索結果数の表示 -->
+    <!-- 該当商品数の表示 -->
     <p class="mt-4">該当商品数: {{ page_obj.paginator.count }} 件</p>
+
+    <!-- 並び替えの選択 -->
+    <div class="mb-3">
+        <label for="sort" class="form-label">並び替え:</label>
+        <select name="sort" id="sort" class="form-select" onchange="this.form.submit()">
+            <option value="name" {% if sort_by == 'name' %}selected{% endif %}>名前順</option>
+            <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>価格が安い順</option>
+            <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>価格が高い順</option>
+        </select>
+    </div>
+    </form>
 
     <!-- 検索結果リスト -->
     <ul class="list-group">
@@ -103,8 +122,8 @@
 <script>
     document.getElementById('resetButton').addEventListener('click', function() {
         const form = document.getElementById('searchForm');
-        form.reset();
-        form.submit();
+        form.reset(); // フォームをリセット
+        window.location.href = "{% url 'search_view' %}"; // ページをリロード
     });
 </script>
 
