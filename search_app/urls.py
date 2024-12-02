@@ -1,6 +1,6 @@
 from django.urls import path 
 from . import views 
-from .views import change_password, toggle_favorite, favorites_list
+from .views import change_password, toggle_favorite, favorites_list, remove_from_cart
  
 urlpatterns = [ 
     path('', views.search_view), 
@@ -14,4 +14,12 @@ urlpatterns = [
     path('change-password/', change_password, name='change_password'),
     path('favorites/<int:product_id>/', toggle_favorite, name='toggle_favorite'),
     path('favorites/', favorites_list, name='favorites_list'),
+    path('cart/', views.cart_view, name='cart'),
+    path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('remove_from_cart/<int:product_id>/', remove_from_cart, name='remove_from_cart'),
+    path('update_quantity/<int:product_id>/', views.update_quantity, name='update_quantity'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('purchase/', views.purchase_view, name='purchase'),
+    path('purchase-history/', views.purchase_history, name='purchase_history'),
+    path('purchase-complete/', views.purchase_complete_view, name='purchase_complete'),
 ] 

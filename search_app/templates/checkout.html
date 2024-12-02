@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+{% block title %}購入手続き{% endblock %}
+{% block content %}
+
+<h1>購入内容の確認</h1>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>商品名</th>
+            <th>数量</th>
+            <th>金額</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product_id, item in cart.items %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price|floatformat:0|intcomma }}円</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p>合計金額: {{ total_price|floatformat:0|intcomma }}円</p>
+
+<div>
+    <form action="{% url 'cart' %}" method="get" style="display:inline;">
+        <button type="submit" class="btn btn-secondary">カートに戻る</button>
+    </form>
+    <form action="{% url 'checkout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">購入する</button>
+    </form>
+</div>
+
+{% endblock %}

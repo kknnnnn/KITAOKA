@@ -1,14 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Category, Favorite, SearchHistory
+from .models import Product, Category, Favorite, SearchHistory, Purchase
 from .forms import ProductForm, SearchForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from .forms import CustomPasswordChangeForm
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotAllowed
 from decimal import Decimal
 from django.db.models import Count
 
@@ -182,8 +182,15 @@ def search_view(request):
 
 @login_required
 def mypage_view(request):
-    # ユーザーの情報などを表示する
-    return render(request, 'mypage.html')
+    # 現在のビューでは、ユーザー情報を表示する
+    # 新たに、購入履歴をデータベースから取得する機能を追加
+
+    # Purchaseモデルからログイン中のユーザーの購入履歴を取得し、
+    # 購入日時が新しい順（降順）に並び替え
+    purchases = Purchase.objects.filter(user=request.user).order_by('-purchased_at')
+
+    # テンプレートに購入履歴（purchases）を渡して、購入履歴を表示できるようにする
+    return render(request, 'mypage.html', {'purchases': purchases})
 
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = 'templates/password_change.html'  # カスタムテンプレート
@@ -242,3 +249,176 @@ def product_view(request, pk):
         'product': product
     }
     return render(request, 'product_detail.html', context)
+
+def add_to_cart(request, product_id):
+    if request.method == 'POST':
+        # 商品を取得
+        product = get_object_or_404(Product, pk=product_id)
+        
+        # セッションにカートがない場合は作成
+        cart = request.session.get('cart', {})
+        
+        # カートに商品を追加（数量を1増やす）
+        if str(product_id) in cart:
+            cart[str(product_id)]['quantity'] += 1
+        else:
+            cart[str(product_id)] = {
+                'name': product.name,
+                'price': float(product.price),  # Decimalをfloatに変換
+                'quantity': 1,
+            }
+        
+        # セッションにカートを保存
+        request.session['cart'] = cart
+        
+        # メッセージを表示
+        messages.success(request, f"{product.name}をカートに追加しました。")
+        
+        # JSONレスポンスを返す
+        return JsonResponse({
+            'message': f"{product.name}をカートに追加しました。",
+            'cart_count': sum(item['quantity'] for item in cart.values())
+        })
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+    
+def cart_view(request):
+    cart = request.session.get('cart', {})  # セッションからカートを取得
+    total_price = 0  # 合計金額を初期化
+    cart_items = []  # 商品情報を格納するリスト
+
+    # カート内の各商品について処理
+    for product_id, product_data in cart.items():
+        subtotal = product_data['price'] * product_data['quantity']  # 小計を計算
+        product_data['subtotal'] = subtotal  # 小計を商品データに追加
+        product_data['product_id'] = product_id  # product_idを商品データに追加
+        cart_items.append(product_data)  # 商品情報をリストに追加
+        total_price += subtotal  # 合計金額に小計を加算
+
+    # コンテキストにカート情報と合計金額を追加
+    context = {
+        'cart_items': cart_items,  # 計算済みのカートアイテム
+        'total_price': total_price,  # 合計金額
+    }
+    return render(request, 'cart.html', context)
+
+def remove_from_cart(request, product_id):
+    if request.method == 'POST':
+        # カートから商品を削除
+        cart = request.session.get('cart', {})
+
+        if str(product_id) in cart:
+            del cart[str(product_id)]
+            request.session['cart'] = cart
+
+        # カート画面にリダイレクト
+        return redirect('cart')  # 'cart_view'はカートの表示ページのURL名
+
+def update_quantity(request, product_id):
+    if request.method == 'POST':
+        # セッションからカートを取得
+        cart = request.session.get('cart', {})
+
+        # 商品がカートに存在するかチェック
+        if str(product_id) in cart:
+            try:
+                # フォームから数量を取得（空の場合は1）
+                quantity = int(request.POST.get('quantity', 1))
+                
+                # 数量が1未満の場合は1に設定
+                if quantity < 1:
+                    quantity = 1
+                
+                # カート内の商品数量を更新
+                cart[str(product_id)]['quantity'] = quantity
+                
+                # セッションに更新したカートを保存
+                request.session['cart'] = cart
+                
+                # 成功メッセージ
+                messages.success(request, f"{cart[str(product_id)]['name']}の数量を変更しました。")
+            except ValueError:
+                # 数量が整数でない場合のエラーハンドリング
+                messages.error(request, "無効な数量が入力されました。")
+        else:
+            # 商品がカートにない場合のエラーメッセージ
+            messages.error(request, "カートにその商品はありません。")
+        
+        # カートページにリダイレクト
+        return redirect('cart')
+    
+    # POST以外のリクエストに対する処理
+    return redirect('cart')
+    
+@login_required
+def checkout(request):
+    # カート情報を取得
+    cart = request.session.get('cart', {})
+    
+    if request.method == 'POST':
+        # 購入処理を実行（例: 購入情報をデータベースに保存）
+        for product_id, item in cart.items():
+            Purchase.objects.create(
+                user=request.user,
+                product_name=item['name'],  # 商品名
+                quantity=item['quantity'],  # 数量
+                total_price=item['price'] * item['quantity'],  # 小計（価格 * 数量）
+            )
+        
+        # カートをクリア
+        request.session['cart'] = {}
+
+        # 購入完了画面へリダイレクト
+        return redirect('purchase_complete')
+    
+    # GETリクエスト: 購入確認画面を表示
+    total_price = sum(item['price'] * item['quantity'] for item in cart.values())  # 合計金額
+    context = {
+        'cart': cart,  # カートの内容
+        'total_price': total_price,  # 合計金額
+    }
+    return render(request, 'checkout.html', context)
+
+@login_required
+def purchase_view(request):
+    cart = request.session.get('cart', {})
+    if not cart:
+        messages.error(request, "カートが空です。")
+        return redirect('cart')
+
+    total_price = 0
+    for product_id, item in cart.items():
+        total_price += item['price'] * item['quantity']
+        # 購入履歴に保存
+        Purchase.objects.create(
+            user=request.user,
+            product_name=item['name'],
+            quantity=item['quantity'],
+            total_price=item['price'] * item['quantity'],
+        )
+    
+    # カートをクリア
+    request.session['cart'] = {}
+
+    messages.success(request, "購入が完了しました！")
+    # 購入完了画面にリダイレクト
+    return redirect('purchase_complete')
+
+@login_required
+def purchase_history(request):
+    # ユーザーの購入履歴を取得
+    purchases = Purchase.objects.filter(user=request.user).order_by('-purchased_at')
+    
+    # 購入履歴がない場合のフラグを設定
+    no_purchases = not purchases.exists()
+
+    context = {
+        'purchases': purchases,
+        'no_purchases': no_purchases,
+    }
+
+    return render(request, 'purchase_history.html', context)
+
+@login_required
+def purchase_complete_view(request):
+    return render(request, 'purchase_complete.html')

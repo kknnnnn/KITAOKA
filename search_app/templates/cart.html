@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+{% block title %}カート{% endblock %}
+{% block content %}
+    <h2>カート</h2>
+
+    {% if cart_items %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>商品名</th>
+                    <th>価格</th>
+                    <th>数量</th>
+                    <th>小計</th>
+                    <th>削除</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.price|floatformat:0|intcomma }}円</td>
+                        <td>
+                            <form action="{% url 'update_quantity' item.product_id %}" method="POST">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control" style="width: 60px;">
+                                <button type="submit" class="btn btn-primary">更新</button>
+                            </form>
+                        </td>
+                        <td>{{ item.subtotal|floatformat:0|intcomma }}円</td>
+                        <td>
+                            <form action="{% url 'remove_from_cart' item.product_id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">削除</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total-price">
+            <h3>合計金額: {{ total_price|floatformat:0|intcomma }}円</h3>
+        </div>
+    {% else %}
+        <p>カートは空です。</p>
+    {% endif %}
+    
+    <form action="{% url 'checkout' %}" method="get">
+        <button type="submit" class="btn btn-primary">購入手続きへ進む</button>
+    </form>
+    
+{% endblock %}

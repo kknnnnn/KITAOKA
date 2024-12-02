@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}購入履歴{% endblock %}
+{% block content %}
+
+    <div class="container">
+        <h1>購入履歴</h1>
+
+        {% if no_purchases %}
+            <p>購入履歴はありません。</p>
+        {% else %}
+            <div class="order">
+                <ul>
+                    {% for purchase in purchases %}
+                        <li>
+                            商品名: {{ purchase.product_name }}<br>
+                            数量: {{ purchase.quantity }}<br>
+                            合計金額: ¥{{ purchase.total_price|intcomma }}<br>
+                            購入日: {{ purchase.purchased_at }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

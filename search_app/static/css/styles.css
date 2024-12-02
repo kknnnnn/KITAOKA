@@ -1,3 +1,19 @@
+.messages {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.fade-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    opacity: 1;
+    transition: opacity 1s;
+}
+
 /* ナビゲーションバーを上に固定 */
 .navbar {
     position: fixed; /* 固定位置に設定 */

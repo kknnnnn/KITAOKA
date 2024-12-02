@@ -46,6 +46,14 @@
                             </button>
                         </form>
 
+                        <form id="add-to-cart-form" action="{% url 'add_to_cart' product.pk %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">カートに追加</button>
+                        </form>
+                        
+                        <!-- メッセージ表示 -->
+                        <div id="cart-message" class="alert alert-success d-none" role="alert"></div>
+
                         <a href="{% url 'search_view' %}" class="btn btn-primary">商品一覧に戻る</a>
 
                         {% endif %}
