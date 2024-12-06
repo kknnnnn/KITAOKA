@@ -10,7 +10,7 @@
             <h1 class="text-center mb-4">{{ product.name }}の詳細</h1>
 
             <!-- 商品詳細カード -->
-            <div class="card shadow-sm">
+            <div class="CARD shadow-sm">
                 <div class="card-body">
                     <h2 class="card-title">{{ product.name }}</h2>
                     
@@ -29,33 +29,38 @@
                     
                     <!-- ボタンの配置 -->
                     <div class="d-flex justify-content-between mt-4">
-                        <form action="{% url 'product_update' product.pk %}" method="GET" style="display:inline;">
-                            <button type="submit" class="btn btn-secondary">編集</button>
-                        </form>
                         
-                        <form action="{% url 'product_delete' product.pk %}" method="GET" style="display:inline;">
-                            <button type="submit" class="btn btn-danger">削除</button>
-                        </form>
-
-                        <!-- お気に入り追加・解除ボタン -->
                         {% if user.is_authenticated %}  <!-- ログインしているか確認 -->
-                        <form action="{% url 'toggle_favorite' product.pk %}" method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn {% if product.id in favorites %}btn-danger{% else %}btn-warning{% endif %}">
-                                {% if product.id in favorites %}お気に入り解除{% else %}お気に入り追加{% endif %}
-                            </button>
-                        </form>
-
-                        <form id="add-to-cart-form" action="{% url 'add_to_cart' product.pk %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">カートに追加</button>
-                        </form>
+                            <!-- 編集ボタン -->
+                            <form action="{% url 'product_update' product.pk %}" method="GET" style="display:inline;">
+                                <button type="submit" class="btn btn-secondary">編集</button>
+                            </form>
                         
-                        <!-- メッセージ表示 -->
-                        <div id="cart-message" class="alert alert-success d-none" role="alert"></div>
+                            <!-- 削除ボタン -->
+                            <form action="{% url 'product_delete' product.pk %}" method="GET" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">削除</button>
+                            </form>
 
-                        <a href="{% url 'search_view' %}" class="btn btn-primary">商品一覧に戻る</a>
+                            <!-- お気に入り追加・解除ボタン -->
+                            <form action="{% url 'toggle_favorite' product.pk %}" method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn {% if product.id in favorites %}btn-danger{% else %}btn-warning{% endif %}">
+                                    {% if product.id in favorites %}お気に入り解除{% else %}お気に入り追加{% endif %}
+                                </button>
+                            </form>
 
+                            <!-- カートに追加ボタン -->
+                            <form id="add-to-cart-form" action="{% url 'add_to_cart' product.pk %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">カートに追加</button>
+                            </form>
+
+                            <!-- メッセージ表示 -->
+                            <div id="cart-message" class="alert alert-success d-none" role="alert"></div>
+
+                        {% else %}
+                            <!-- ログインしていない場合 -->
+                            <p>ログインして商品を編集・削除できます。</p>
                         {% endif %}
                     </div>
                 </div>
@@ -68,7 +73,7 @@
     {% if same_category_products %}
         <ul>
             {% for item in same_category_products %}
-                <li>{{ item.name }} - {{ item.price }}</li>
+                <li>{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</li>
             {% endfor %}
         </ul>
     {% else %}
@@ -80,7 +85,7 @@
     {% if similar_price_products %}
         <ul>
             {% for item in similar_price_products %}
-                <li>{{ item.name }} - {{ item.price }}</li>
+                <li>{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</li>
             {% endfor %}
         </ul>
     {% else %}

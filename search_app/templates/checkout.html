@@ -1,38 +1,46 @@
 {% extends 'base.html' %}
 
 {% load humanize %}
-{% block title %}購入手続き{% endblock %}
+{% load static %}
+{% block title %}購入内容の確認{% endblock %}
 {% block content %}
 
-<h1>購入内容の確認</h1>
+<h1 class="text-center">購入内容の確認</h1>
 
-<table border="1">
+<table class="custom-table">
     <thead>
         <tr>
             <th>商品名</th>
+            <th>価格</th>
             <th>数量</th>
-            <th>金額</th>
+            <th>小計</th>
         </tr>
     </thead>
     <tbody>
-        {% for product_id, item in cart.items %}
+        {% for item in cart_items %}
         <tr>
-            <td>{{ item.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.price|floatformat:0|intcomma }}円</td>
+            <td>{{ item.name }}</td>  <!-- 商品名 -->
+            <td class="item-price" data-price="{{ item.price }}">{{ item.price|floatformat:0|intcomma }}円</td>  <!-- 価格 -->
+            <td>
+                <!-- 数量の表示（編集不可） -->
+                <span>{{ item.quantity }}</span>
+            </td>
+            <td class="item-subtotal">{{ item.subtotal|floatformat:0|intcomma }}円</td>  <!-- 小計 -->
         </tr>
         {% endfor %}
     </tbody>
 </table>
-<p>合計金額: {{ total_price|floatformat:0|intcomma }}円</p>
 
-<div>
+<!-- 合計金額の表示 -->
+<div class="text-center"><p class="total-price">合計金額　<span>{{ total_price|floatformat:0|intcomma }}</span>円</p></div>
+
+<div class="buttons">
     <form action="{% url 'cart' %}" method="get" style="display:inline;">
-        <button type="submit" class="btn btn-secondary">カートに戻る</button>
+        <button type="submit" class="custom-button">カートに戻る</button>
     </form>
     <form action="{% url 'checkout' %}" method="post" style="display:inline;">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success">購入する</button>
+        <button type="submit" class="custom-button success">購入する</button>
     </form>
 </div>
 

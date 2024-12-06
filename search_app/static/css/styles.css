@@ -1,3 +1,7 @@
+body {
+    margin: 0px;
+    margin-bottom: 80px;
+}
 .messages {
     list-style: none;
     padding: 0;
@@ -14,32 +18,517 @@
     transition: opacity 1s;
 }
 
-/* ナビゲーションバーを上に固定 */
-.navbar {
-    position: fixed; /* 固定位置に設定 */
-    top: 0;          /* 上端に配置 */
-    left: 0;         /* 左端に配置 */
-    right: 0;        /* 右端に配置 */
-    z-index: 1050;   /* 他の要素より前面に表示 */
-    width: 100%;     /* 幅を100%に設定 */
-    background-color: magenta;
-}
-
-/* ナビゲーションバーの下にコンテンツが隠れないように、bodyにマージンを設定 */
-body {
-    padding-top: 80px; /* ナビゲーションバーの高さ分だけ余白を追加 */
-}
-
-.cart {
-    width: 40px;
-    height: auto;
-}
-
 #resetButton a {
     text-decoration: none;
 }
 
 footer {
-    background-color: magenta;
+    background-color: #f8f9fa; /* navbarと同じ色 */
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 37px; /* navbarと同じ高さ */
+    padding: 0 20px; /* navbarと同じ左右のパディング */
+
+    /* 中央揃えのためのFlexbox */
+    display: flex;
+    align-items: center; /* 垂直方向に中央揃え */
+    justify-content: center; /* 水平方向に中央揃え */
+    
+    /* ボックスシャドウを追加して浮き上がり感を出す */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* navbarと反対方向のシャドウ */
+}
+
+/* 右上に固定された検索アイコン */
+.search {
+    position: fixed;
+    top: 85px;
+    right: 28px;
+    width: 50px; /* サイズ調整 */
+    height: auto;
+    cursor: pointer;
+    z-index: 1060;
+}
+
+.search-form-container {
+    position: fixed;
+    top: 50px; /* フォームの位置を少し下に */
+    right: 20px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    width: 300px; /* 幅を指定してみる */
+    margin-top: 30px; /* 上部の余白を調整 */
+}
+
+.search-form-container input[type="text"] {
+    margin-top: 10px; /* 検索キーワードフィールドを少し下げる */
+}
+
+/* フォームの非表示時 */
+.d-none {
+    display: none;
+}
+
+.card {
+    width: 100%;
+    max-width: 18vw;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    overflow: hidden;
     text-align: center;
+    padding: 0 40px; 
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1); /* 影を追加  */
+    transition: box-shadow 0.3s ease; /* ホバー時のアニメーション   */
+    margin-bottom: 30px;
+
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* ホバー時に影を強調 */
+}
+
+.card-img-top {
+    width: 100%; /* カード幅に合わせる */
+    height: 250px; /* 高さを少し大きく */
+    object-fit: contain; /* 画像全体を表示 */
+    background-color: #f8f8f8; /* 背景色（画像がない部分） */
+    margin-top: 15px; /* 下方向に配置を調整 */
+    background-color: white;
+
+}
+
+.pagination {
+    text-align: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* リンクの下線を消すスタイル */
+.card-link {
+    text-decoration: none; /* 下線を消す */
+    color: inherit; /* リンクの色を親要素と同じにする */
+}
+
+.margin-top {
+    margin-top: 80px;  /* ナビゲーションバーの高さに合わせて調整 */
+}
+
+.main-container{
+    width: 80%;
+    margin: auto;
+}
+.row{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-gap: 10px;
+    overflow: hidden;
+}
+.card-title{
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 2vh;
+    margin-top: 8px; /* 商品名と画像の間隔を狭める */
+    margin-bottom: 10px; /* 必要なら商品名と価格の間隔も調整 */
+}
+
+.new-product {
+    position: fixed;
+    bottom: 45px; /* 画面下からの距離 */
+    right: 20px;  /* 画面右からの距離 */
+    width: 65px;  /* 画像の幅を小さく調整 */
+    height: auto; /* 高さは自動調整 */
+    z-index: 9999; /* 他のコンテンツの上に表示 */
+}
+
+/* ナビゲーションバー */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    padding: 0 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+}
+
+/* 各アイテム */
+.navbar-item {
+    flex: 1; /* 各アイテムを均等に分ける */
+    text-align: center;
+    position: relative;
+    padding: 0 10px;
+}
+
+/* 縦線 */
+.navbar-item:not(:last-child)::after {
+    content: '|';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -10px;
+    font-size: 24px;
+    color: #ccc;
+    line-height: 60px; /* アイテムの高さと一致させる */
+}
+
+/* ナビゲーションバーのリンク */
+.navbar-item a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 60px;
+}
+
+.navbar-item a:hover {
+    color: #007bff;
+}
+
+.mypage {
+    margin-top: 75px;
+}
+
+.cart {
+    margin-top: 75px;
+}
+
+.margin-top {
+    margin-top: 75px;
+}
+
+/* 共通のフォームスタイル */
+.form-container {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 100px auto 0; /* ナビゲーションバーの高さ分だけ余白を空ける */
+}
+
+/* 入力フォームのラベルとフィールド */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* プレースホルダーの色変更 (少し濃いグレー) */
+input::placeholder {
+    color: #777;
+}
+
+/* ボタンの共通デザイン */
+button, .btn-login {
+    width: 100%;
+    padding: 10px;
+    background-color: #777; /* ボタンの色 (濃いグレー) */
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* ボタンホバー時のスタイル */
+button:hover, .btn-login:hover {
+    background-color: #555; /* ホバー時に少し暗く */
+}
+
+/* ログインフォーム特有のスタイル */
+.login-container {
+    width: 100%;
+    max-width: 400px; /* 最大幅を400pxに制限 */
+    margin: 100px auto 20px; /* 上に100pxの余白を追加してナブバーと重ならないように */
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ddd; /* 薄いグレーの枠線 */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 少し浮き上がらせるシャドウ */
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ログインタイトル */
+h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.mypage-links {
+    display: flex; /* 横並びにする */
+    justify-content: center; /* 中央寄せ */
+    gap: 20px; /* 要素間のスペース */
+    margin-top: 20px;
+}
+
+.mypage-item {
+    width: 200px; /* 四角の幅を広げる */
+    display: flex; /* 画像と文字を縦に揃える */
+    flex-direction: column; /* 縦並びにする */
+    align-items: center; /* 中央揃え */
+    text-align: center; /* テキスト中央揃え */
+    background-color: #f0f0f0; /* 背景色 */
+    color: #333; /* テキスト色 */
+    padding: 15px; /* 内側の余白 */
+    text-decoration: none; /* 下線を消す */
+    border-radius: 8px; /* 角を丸くする */
+    border: 1px solid #ccc; /* 境界線 */
+    transition: background-color 0.3s ease; /* ホバー時のアニメーション */
+}
+
+.mypage-item:hover {
+    background-color: #e0e0e0; /* ホバー時の背景色 */
+    border-color: #999; /* ホバー時の境界線色 */
+}
+
+.mypage-icon {
+    width: 60px; /* 画像の幅を小さくする */
+    height: auto; /* アスペクト比を維持 */
+    margin-bottom: 10px; /* 画像と文字の間のスペース */
+}
+
+/* ボタンの共通デザイン */
+button, .btn-login {
+    width: 100%;
+    padding: 10px;
+    background-color: #777; /* ボタンの色 (濃いグレー) */
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* ボタンホバー時のスタイル */
+button:hover, .btn-login:hover {
+    background-color: #555; /* ホバー時に少し暗く */
+}
+
+.custom-button {
+    display: inline-block; /* ボタンの幅を調整可能にする */
+    width: 200px;          /* ボタンの幅を指定 */
+    padding: 10px 15px;    /* 内側の余白を調整 */
+    background-color: #007bff; /* 背景色 */
+    color: #fff;           /* テキストの色 */
+    font-size: 16px;       /* フォントサイズ */
+    border: none;          /* 枠線を消す */
+    border-radius: 5px;    /* 角丸 */
+    text-align: center;    /* テキストを中央揃え */
+    cursor: pointer;       /* ホバー時にポインターを表示 */
+    text-decoration: none; /* テキストの下線を消す */
+}
+
+.custom-button:hover {
+    background-color: #0056b3; /* ホバー時の背景色 */
+}
+
+.custom-button:active {
+    background-color: #004494; /* クリック時の背景色 */
+}
+
+.katamari {
+    position: absolute;
+    top: 40%; /* 上に移動 */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 90%;
+}
+
+.katamari table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.katamari th, .katamari td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.katamari .total-price {
+    text-align: left; /* 左寄せ */
+    font-size: 18px; /* 視認性向上 */
+    margin-bottom: 20px;
+}
+
+.katamari .custom-button, .katamari .btn-danger {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #777; /* 削除ボタンの色 */
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.katamari .custom-button:hover, .katamari .btn-danger:hover {
+    background-color: #555; /* 削除ボタンのホバー色 */
+}
+
+/* テーブルのスタイル */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.custom-table th, .custom-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.custom-table th {
+    background-color: #f2f2f2;
+}
+
+/* 合計金額のスタイル */
+.total-price {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* ボタンのスタイル */
+.custom-button {
+    padding: 10px 20px;
+    background-color: #777;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.custom-button:hover {
+    background-color: #555;
+}
+
+.custom-button.success {
+    background-color: #777;
+}
+
+.custom-button.success:hover {
+    background-color: #555;
+}
+
+/* ボタンの配置 */
+.buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* テキストセンター */
+.text-center {
+    text-align: center;
+}
+
+/* ヘッダーh1タグの調整: ナビゲーションバーに隠れないように */
+h1 {
+    margin-top: 80px;  /* ナビゲーションバー分の余白を追加 */
+    margin-bottom: 50px;  /* 表との間隔を広げる */
+}
+
+/* テーブル全体の設定 */
+.custom-table {
+    width: 80%;  /* テーブルの横幅を80%に設定 */
+    margin: 0 auto;  /* 中央揃え */
+    border-collapse: collapse;  /* テーブルの枠線をまとめる */
+}
+
+/* テーブルセルの設定 */
+.custom-table th, .custom-table td {
+    padding: 10px;  /* セルのパディングを設定 */
+    text-align: center;  /* テキストを中央揃え */
+}
+
+/* 合計金額の位置調整 */
+.total-price {
+    font-size: 1.5em;  /* 合計金額の文字サイズ */
+    font-weight: bold;  /* 合計金額を太字に */
+    margin-top: 30px;  /* テーブルから少し余白を追加 */
+    margin-left: 0;  /* 左側に余白を追加 */
+    position: relative;
+    left: 0;  /* テーブルの左端と揃える */
+}
+
+/* ボタンを横並びにするための設定 */
+.button-group {
+    display: flex; /* フレックスボックスで横並びに */
+    justify-content: space-between; /* ボタン間にスペースを均等に */
+    gap: 10px; /* ボタン間の間隔 */
+    margin-top: 10px; /* 上部に余白を追加 */
+}
+
+.btn-search, .btn-reset {
+    background-color: #555; /* 色 */
+    color: white;
+    border: none;
+    padding: 8px 16px; /* 高さと幅を狭く調整 */
+    font-size: 14px; /* 文字サイズ */
+    cursor: pointer;
+    border-radius: 5px;
+    width: auto; /* 幅は自動調整 */
+    transition: background-color 0.3s ease;
+}
+
+.btn-search:hover {
+    background-color: #777; /* ホバー時 */
+}
+
+.btn-reset {
+    background-color: #555; /* リセットボタンの色 */
+}
+
+.btn-reset:hover {
+    background-color: #777; /* ホバー時 */
 }

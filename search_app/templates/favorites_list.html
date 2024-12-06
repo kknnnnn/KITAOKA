@@ -6,26 +6,39 @@
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">お気に入り一覧</h1>
-    <div class="row">
-        {% for favorite in favorites %}
-            <div class="col-md-4 col-lg-3 mb-4">
-                <div class="card shadow-sm">
-                    {% if favorite.product.image %}
-                        <img src="{{ favorite.product.image.url }}" class="card-img-top" alt="{{ favorite.product.name }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ favorite.product.name }}</h5>
-                        <p class="card-text">{{ favorite.product.description }}</p>
-                        <p class="card-text"><strong>{{ favorite.product.price|floatformat:0|intcomma }}円</strong></p>
-                        <a href="{% url 'product_detail' favorite.product.pk %}" class="btn btn-primary">詳細</a>
+    
+    <!-- お気に入り件数の表示 -->
+    <div class="text-center mt-4">
+        <p>お気に入りの商品は {{ favorites|length }} 件です。</p>
+    </div>
+    <!-- 商品リスト -->
+    <div class="main-container">
+        <div class="row">
+            {% for favorite in favorites %}
+                <div class="col-md-4 mb-4">
+                    <!-- 商品情報全体をクリック可能にするため、クリックイベントを設定 -->
+                    <div class="card" onclick="window.location.href='{% url 'product_detail' favorite.product.pk %}'">
+                        {% if favorite.product.image %}
+                            <img src="{{ favorite.product.image.url }}" alt="{{ favorite.product.name }}" class="card-img-top">
+                        {% else %}
+                            <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="card-img-top">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                {{ favorite.product.name }}
+                            </h5>
+                            <p class="card-text"><strong>{{ favorite.product.price|floatformat:0|intcomma }}円</strong></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% empty %}
-            <p class="text-center">お気に入りはまだありません。</p>
-        {% endfor %}
+            {% empty %}
+                <div class="col-12">
+                    <p class="text-center">お気に入りはまだありません。</p>
+                </div>
+            {% endfor %}
+        </div>
     </div>
-    <a href="{% url 'mypage' %}" class="btn btn-primary">戻る</a>  <!-- 追加したボタン -->
+
 </div>
 
 {% endblock %}

@@ -5,71 +5,65 @@
 {% load humanize %}
 
 <div class="container mt-5">
-    <h1 class="text-center mb-4">商品検索</h1>
+    <div class="margin-top">
+        <h1 class="text-center">商品検索</h1>
+    </div>
 
-    <!-- 人気ランキング表示 -->
-    <h2>人気ランキング TOP3</h2>
-    <ul>
-        {% for product in popular_products %}
-            <li>
-                {{ forloop.counter }}位: 
-                <a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a> 
-                - お気に入り数: {{ product.favorites_count }}
-            </li>
-        {% empty %}
-            <li>現在、お気に入りランキングはありません。</li>
-        {% endfor %}
-    </ul>
+    <!-- 検索アイコン -->
+    <img src="{% static 'images/search.png' %}" alt="Search Image" class="search" id="search-icon">
 
-    {% if user.is_authenticated %}
-        <h3>過去の検索履歴</h3>
-        {% if search_histories %}
-            <ul>
-                {% for history in search_histories %}
-                    <li>
-                        <a href="{% url 'search_view' %}?query={{ history.query }}&category={{ history.category_name }}&min_price={{ history.min_price }}&max_price={{ history.max_price }}">
-                            {{ history.created_at|date:"Y年m月d日 H:i" }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>過去の検索履歴はありません。</p>
-        {% endif %}
-    {% endif %}
+    <div id="search-form-container" class="search-form-container d-none">
+        <form method="GET" action="{% url 'search_view' %}">
+            {{ form.as_p }}
+            <!-- カテゴリ選択 -->
+            <div class="mb-3">
+                <label for="category" class="form-label">カテゴリ:</label>
+                <select name="category" id="category" class="form-select">
+                    <option value="">すべて</option>
+                    <option value="本" {% if category_name == '本' %}selected{% endif %}>本</option>
+                    <option value="電子機器" {% if category_name == '電子機器' %}selected{% endif %}>電子機器</option>
+                </select>
+            </div>
+            <!-- 価格フィルター -->
+            <div class="mb-3">
+                <label for="min_price" class="form-label">最低価格:</label>
+                <input type="number" name="min_price" id="min_price" min="0" class="form-control" value="{{ min_price }}">
+            </div>
+            <div class="mb-3">
+                <label for="max_price" class="form-label">最高価格:</label>
+                <input type="number" name="max_price" id="max_price" min="0" class="form-control" value="{{ max_price }}">
+            </div>
+            <!-- 検索ボタンとリセットボタン -->
+            <div class="d-flex">
+                <button type="submit" class="btn-search">検索</button> <!-- 検索ボタン -->
+                <button type="submit" name="reset" value="true" class="btn-reset">リセット</button> <!-- リセットボタン -->
+            </div>
+    </div>    
 
-    <!-- 検索フォーム -->
-    <form method="get" class="mb-4" id="searchForm">
-        {{ form.as_p }}
-        <!-- カテゴリ選択 -->
-        <div class="mb-3">
-            <label for="category" class="form-label">カテゴリ:</label>
-            <select name="category" id="category" class="form-select">
-                <option value="">すべて</option>
-                <option value="本" {% if category_name == '本' %}selected{% endif %}>本</option>
-                <option value="電子機器" {% if category_name == '電子機器' %}selected{% endif %}>電子機器</option>
-            </select>
-        </div>
-        <!-- 価格フィルター -->
-        <div class="mb-3">
-            <label for="min_price" class="form-label">最低価格:</label>
-            <input type="number" name="min_price" id="min_price" min="0" class="form-control" value="{{ min_price }}">
-        </div>
-        <div class="mb-3">
-            <label for="max_price" class="form-label">最高価格:</label>
-            <input type="number" name="max_price" id="max_price" min="0" class="form-control" value="{{ max_price }}">
-        </div>
-
-        <!-- 検索ボタンとリセットボタン -->
-        <div class="d-flex">
-            <button type="submit" class="btn btn-primary me-2">検索</button>
-            <button type="button" class="btn btn-secondary" id="resetButton">リセット</button>
-        </div>
+    <div class="text-center">
+        <!-- 人気ランキング表示 -->
+        <h2>人気ランキング TOP3</h2>
+        <ul style="list-style-type: none; padding: 0;">
+            {% for product in popular_products %}
+                <li>
+                    {{ forloop.counter }}位: 
+                    <a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a> 
+                    - お気に入り数: {{ product.favorites_count }}
+                </li>
+            {% empty %}
+                <li>現在、お気に入りランキングはありません。</li>
+            {% endfor %}
+        </ul>
+    </div>
 
     <!-- データ新規入力ボタン -->
-    <a href="{% url 'product_create' %}" class="btn btn-success mt-3">データの新規入力</a>
+    <a href="{% url 'product_create' %}">
+        <img src="{% static 'images/IMG_5334.PNG' %}" alt="固定画像" class="new-product">
+    </a>
 
-    <!-- 該当商品数の表示 -->
+    <!-- 検索結果リスト -->
+    <div class="main-container">
+            <!-- 該当商品数の表示 -->
     <p class="mt-4">該当商品数: {{ page_obj.paginator.count }} 件</p>
 
     <!-- 並び替えの選択 -->
@@ -82,23 +76,30 @@
         </select>
     </div>
     </form>
-
-    <!-- 検索結果リスト -->
-    <ul class="list-group">
+    <div class="row">
         {% for product in page_obj %}
-            <li class="list-group-item">
-                <a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a> - ¥{{ product.price|intcomma }}<br>
-        
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail">
-                {% else %}
-                    <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="img-thumbnail">
-                {% endif %}
-            </li>
+            <div class="col-md-4 mb-4">
+                <a href="{% url 'product_detail' product.pk %}" class="card-link text-decoration-none">
+                    <div class="card">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top">
+                        {% else %}
+                            <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="card-img-top">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.price|floatformat:0|intcomma }}円</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
         {% empty %}
-            <li class="list-group-item">商品がありません。</li>
+            <div class="col-12">
+                <p>商品がありません。</p>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
+    </div>
 
     <!-- ページネーション -->
     <div class="pagination mt-4">
@@ -124,6 +125,15 @@
         const form = document.getElementById('searchForm');
         form.reset(); // フォームをリセット
         window.location.href = "{% url 'search_view' %}"; // ページをリロード
+    });
+</script>
+<script src="{% static 'js/search_image.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchIcon = document.getElementById('search-icon');
+        if (searchIcon) {
+            searchIcon.addEventListener('click', toggleSearchForm);
+        }
     });
 </script>
 

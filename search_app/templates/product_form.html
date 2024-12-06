@@ -3,40 +3,33 @@
 {% block content %}
 {% load static %}
 
-<div class="container mt-5"> 
-  <div class="row justify-content-center"> 
-    <div class="col-md-6"> 
-      <h2 class="text-center mb-4">商品{% if product.id %}編集{% else %}作成{% endif %}</h2> 
-      <!-- 商品フォーム --> 
-      <form method="POST" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm"> 
-          {% csrf_token %} 
-          {{ form.as_p }} 
-          
-          <!-- エラーメッセージの表示 -->
-          {% if form.errors %}
-            <div class="alert alert-danger">
-              <ul>
-                {% for field, errors in form.errors.items %}
-                  <li>{{ field }}: {{ errors|join:", " }}</li>
-                {% endfor %}
-              </ul>
-            </div>
-          {% endif %}
+<div class="login-container">
+    <h1 class="text-center mb-4">商品{% if product.id %}編集{% else %}作成{% endif %}</h1> <!-- タイトルをログインと同じように調整 -->
 
-          <!-- 画像プレビュー -->
-          {% if product.image %}
-            <div class="mb-3 text-center">
-              <img src="{{ product.image.url }}" alt="現在の画像" class="img-fluid rounded" style="max-height: 200px;">
+    <form method="POST" enctype="multipart/form-data" class="login-form">
+        {% csrf_token %}
+        {{ form.as_p }} 
+
+        <!-- エラーメッセージの表示 -->
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        <li>{{ field }}: {{ errors|join:", " }}</li>
+                    {% endfor %}
+                </ul>
             </div>
-          {% endif %}
-          
-          <div class="d-flex justify-content-between mt-3"> 
-            <!-- 保存ボタン --> 
-            <button type="submit" class="btn btn-primary">保存</button>
-          </div> 
-      </form> 
-    </div> 
-  </div> 
-</div> 
+        {% endif %}
+
+        <!-- 画像プレビュー -->
+        {% if product.image %}
+            <div class="mb-3 text-center">
+                <img src="{{ product.image.url }}" alt="現在の画像" class="img-fluid rounded" style="max-height: 200px;">
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn-login">保存</button> <!-- ボタンのクラスをログインのものと同じに -->
+    </form>
+</div>
 
 {% endblock %}

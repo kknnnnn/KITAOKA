@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load custom_filters %}  <!-- カスタムフィルタをロード -->
+
 {% block title %}購入履歴{% endblock %}
 {% block content %}
 
@@ -9,18 +11,22 @@
         {% if no_purchases %}
             <p>購入履歴はありません。</p>
         {% else %}
-            <div class="order">
-                <ul>
-                    {% for purchase in purchases %}
-                        <li>
-                            商品名: {{ purchase.product_name }}<br>
-                            数量: {{ purchase.quantity }}<br>
-                            合計金額: ¥{{ purchase.total_price|intcomma }}<br>
-                            購入日: {{ purchase.purchased_at }}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+            {% for purchase_time, purchases_in_time in grouped_purchases.items %}
+                <div class="order">
+                    <h3>購入日: {{ purchase_time }}</h3>
+                    <ul>
+                        {% for purchase in purchases_in_time %}
+                            <li>
+                                商品名: {{ purchase.product_name }}<br>
+                                価格: ¥{{ purchase.product.price|intcomma }}<br>
+                                数量: {{ purchase.quantity }}<br>
+                                小計: ¥{{ purchase.total_price|intcomma }}<br>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <p><strong>合計金額: ¥{{ purchase_totals|get_item:purchase_time|intcomma }}</strong></p>
+                </div>
+            {% endfor %}
         {% endif %}
     </div>
 

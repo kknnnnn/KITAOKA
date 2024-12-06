@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Category, Favorite, SearchHistory, Purchase
+from .models import Product, Category, Favorite, Purchase
 from .forms import ProductForm, SearchForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
@@ -11,6 +11,7 @@ from .forms import CustomPasswordChangeForm
 from django.http import JsonResponse, HttpResponseNotAllowed
 from decimal import Decimal
 from django.db.models import Count
+from collections import defaultdict
 
 def product_create(request):
     if request.method == 'POST':
@@ -80,12 +81,31 @@ def product_list(request):
     return render(request, 'product_list.html', {'products': products})
 
 def search_view(request):
+    # 検索フォームの初期化
     form = SearchForm(request.GET or None)
-    
-    # クエリセットの初期化
-    results = Product.objects.all()  # すべてのProductを取得
-    
-    # 検索条件をURLパラメータから取得
+
+    # リセット処理
+    if request.GET.get('reset') == 'true':
+        results = Product.objects.all()
+        paginator = Paginator(results, 9)
+        page_number = 1  # リセット後は1ページ目
+        page_obj = paginator.get_page(page_number)
+
+        return render(request, 'search.html', {
+            'form': SearchForm(),  # 空のフォームを渡す
+            'page_obj': page_obj,
+            'query': '',
+            'category_name': '',
+            'min_price': '',
+            'max_price': '',
+            'sort_by': '',
+            'popular_products': get_popular_products(),
+        })
+
+    # クエリセットの初期化（すべてのProductを取得）
+    results = Product.objects.all()
+
+    # URLパラメータから検索条件を取得
     query = request.GET.get('query', '').strip()
     category_name = request.GET.get('category', '').strip()
     min_price = request.GET.get('min_price', '').strip()
@@ -93,77 +113,45 @@ def search_view(request):
     sort_by = request.GET.get('sort', 'name')
 
     # フィルタリング処理
-    if query:  # クエリがある場合
+    if query:
         results = results.filter(name__icontains=query)
 
-    if category_name:  # カテゴリが指定されている場合
+    if category_name:
         try:
             category = Category.objects.get(name=category_name)
             results = results.filter(category_id=category.id)
         except Category.DoesNotExist:
-            results = results.none()  # 存在しないカテゴリの場合、結果を空にする
+            results = results.none()
 
-    # min_price と max_price の処理
-    if min_price:  # min_price が指定されている場合
+    if min_price:
         try:
-            min_price_value = float(min_price)
-            results = results.filter(price__gte=min_price_value)
+            results = results.filter(price__gte=float(min_price))
         except ValueError:
-            pass  # 無効な値は無視
+            pass
 
-    if max_price:  # max_price が指定されている場合
+    if max_price:
         try:
-            max_price_value = float(max_price)
-            results = results.filter(price__lte=max_price_value)
+            results = results.filter(price__lte=float(max_price))
         except ValueError:
-            pass  # 無効な値は無視
+            pass
 
     # 並び替え処理
     if sort_by == 'price_asc':
         results = results.order_by('price')
     elif sort_by == 'price_desc':
         results = results.order_by('-price')
-    elif sort_by == 'popularity':  # 人気順の並び替え
-        results = results.annotate(favorites_count=Count('favorite')).order_by('-favorites_count')  # 仮にfavorite_countフィールドが人気を表すとする
-    else:  # デフォルトの並び替え（名前順）
+    elif sort_by == 'popularity':
+        results = results.annotate(favorites_count=Count('favorite')).order_by('-favorites_count')
+    else:
         results = results.order_by('name')
 
-    # 検索履歴の保存
-    if request.user.is_authenticated and (query or category_name or min_price or max_price):
-        # 最新3件の履歴を確認して重複しないかをチェック
-        existing_history = SearchHistory.objects.filter(
-            user=request.user,
-            query=query,
-            category_name=category_name,
-            min_price=min_price or None,
-            max_price=max_price or None
-        ).order_by('-id')[:3].exists()  # 最新の3件だけを確認
-        
-        # 同じ条件がなければ新たに履歴を追加
-        if not existing_history:
-            SearchHistory.objects.create(
-                user=request.user,
-                query=query,
-                category_name=category_name,
-                min_price=min_price or None,
-                max_price=max_price or None
-            )
-
-    # 過去の検索履歴を取得（最新3件）
-    search_histories = []
-    if request.user.is_authenticated:
-        search_histories = SearchHistory.objects.filter(user=request.user).order_by('-id')[:3]
-
     # ページネーション
-    paginator = Paginator(results, 10)  # 1ページあたりのアイテム数
-    page_number = request.GET.get('page', 1)  # デフォルトは1ページ目
-    page_obj = paginator.get_page(page_number)
-
-    # 人気ランキング用（お気に入り数が多いTOP3の商品を取得）
-    popular_products = (
-        Product.objects.annotate(favorites_count=Count('favorite'))
-        .order_by('-favorites_count')[:3]
-    )
+    paginator = Paginator(results, 9)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.get_page(page_number)
+    except EmptyPage:
+        page_obj = paginator.get_page(1)  # 無効なページ番号の場合は1ページ目を表示
 
     # テンプレートへのコンテキスト渡し
     context = {
@@ -174,11 +162,18 @@ def search_view(request):
         'min_price': min_price,
         'max_price': max_price,
         'sort_by': sort_by,
-        'popular_products': popular_products,  # 人気ランキング用のコンテキスト
-        'search_histories': search_histories,  # 検索履歴
+        'popular_products': get_popular_products(),
     }
 
     return render(request, 'search.html', context)
+
+
+def get_popular_products():
+    """人気ランキング用のクエリセットを取得"""
+    return (
+        Product.objects.annotate(favorites_count=Count('favorite'))
+        .order_by('-favorites_count')[:3]
+    )
 
 @login_required
 def mypage_view(request):
@@ -372,11 +367,25 @@ def checkout(request):
         return redirect('purchase_complete')
     
     # GETリクエスト: 購入確認画面を表示
-    total_price = sum(item['price'] * item['quantity'] for item in cart.values())  # 合計金額
+    cart_items = []  # 小計を計算するためのリスト
+    total_price = 0
+    
+    # 小計を計算
+    for product_id, item in cart.items():
+        item_subtotal = item['price'] * item['quantity']
+        cart_items.append({
+            'name': item['name'],
+            'price': item['price'],
+            'quantity': item['quantity'],
+            'subtotal': item_subtotal,  # 小計を追加
+        })
+        total_price += item_subtotal  # 合計金額の計算
+    
     context = {
-        'cart': cart,  # カートの内容
+        'cart_items': cart_items,  # 小計を含むカートの内容
         'total_price': total_price,  # 合計金額
     }
+    
     return render(request, 'checkout.html', context)
 
 @login_required
@@ -412,9 +421,24 @@ def purchase_history(request):
     # 購入履歴がない場合のフラグを設定
     no_purchases = not purchases.exists()
 
+    # 購入履歴を購入日時ごとにグループ化
+    grouped_purchases = defaultdict(list)
+    for purchase in purchases:
+        # 購入日でグループ化（購入日時を日付部分のみで比較する場合）
+        purchase_time = purchase.purchased_at.date()  # 日付部分のみ取得
+        grouped_purchases[purchase_time].append(purchase)
+
+    # 購入日時ごとの合計金額を計算
+    purchase_totals = {}
+    for purchase_time, purchases_in_time in grouped_purchases.items():
+        total = sum(purchase.total_price for purchase in purchases_in_time)
+        purchase_totals[purchase_time] = total
+
     context = {
         'purchases': purchases,
         'no_purchases': no_purchases,
+        'grouped_purchases': grouped_purchases,
+        'purchase_totals': purchase_totals,  # 合計金額をコンテキストに追加
     }
 
     return render(request, 'purchase_history.html', context)
