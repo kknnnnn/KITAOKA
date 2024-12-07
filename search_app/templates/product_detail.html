@@ -4,93 +4,89 @@
 {% load static %}
 {% load humanize %}
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h1 class="text-center mb-4">{{ product.name }}の詳細</h1>
+<div class="custom-container">
+    <h1 class="custom-title">{{ product.name }}の詳細</h1>
+    <div class="custom-row">
+        <!-- 商品詳細部分 -->
+        <div class="custom-col">
 
             <!-- 商品詳細カード -->
-            <div class="CARD shadow-sm">
-                <div class="card-body">
-                    <h2 class="card-title">{{ product.name }}</h2>
-                    
+            <div class="custom-card">
+                <div class="custom-card-body">
                     <!-- 画像が設定されているか確認 -->
                     {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid" />
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="custom-img" />
                     {% else %}
-                        <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="img-thumbnail">
+                        <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="custom-img">
                     {% endif %}
-                    
-                    <p class="card-text">{{ product.description }}</p>
-                    <p class="card-text"><strong>{{ product.price|floatformat:0|intcomma }}円</strong></p>
-                    
+
+                    <h2 class="custom-card-title">{{ product.name }}</h2>
+                    <p class="custom-description">{{ product.description }}</p>
+                    <p class="custom-price"><strong>{{ product.price|floatformat:0|intcomma }}円</strong></p>
+
                     <!-- お気に入り数の表示 -->
-                    <p class="card-text"><strong>お気に入り数: {{ favorites_count }}</strong></p>
-                    
-                    <!-- ボタンの配置 -->
-                    <div class="d-flex justify-content-between mt-4">
-                        
-                        {% if user.is_authenticated %}  <!-- ログインしているか確認 -->
-                            <!-- 編集ボタン -->
-                            <form action="{% url 'product_update' product.pk %}" method="GET" style="display:inline;">
-                                <button type="submit" class="btn btn-secondary">編集</button>
-                            </form>
-                        
-                            <!-- 削除ボタン -->
-                            <form action="{% url 'product_delete' product.pk %}" method="GET" style="display:inline;">
-                                <button type="submit" class="btn btn-danger">削除</button>
-                            </form>
-
-                            <!-- お気に入り追加・解除ボタン -->
-                            <form action="{% url 'toggle_favorite' product.pk %}" method="POST" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn {% if product.id in favorites %}btn-danger{% else %}btn-warning{% endif %}">
-                                    {% if product.id in favorites %}お気に入り解除{% else %}お気に入り追加{% endif %}
-                                </button>
-                            </form>
-
-                            <!-- カートに追加ボタン -->
-                            <form id="add-to-cart-form" action="{% url 'add_to_cart' product.pk %}" method="POST">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary">カートに追加</button>
-                            </form>
-
-                            <!-- メッセージ表示 -->
-                            <div id="cart-message" class="alert alert-success d-none" role="alert"></div>
-
-                        {% else %}
-                            <!-- ログインしていない場合 -->
-                            <p>ログインして商品を編集・削除できます。</p>
-                        {% endif %}
-                    </div>
+                    <p class="custom-favorites"><strong>お気に入り数: {{ favorites_count }}</strong></p>
                 </div>
             </div>
         </div>
+
+        <!-- 同じカテゴリ・似た価格帯の商品セクション -->
+        <div class="custom-col custom-products-row">
+            <h2>同じカテゴリの商品</h2>
+            {% if same_category_products %}
+                <ul class="custom-list">
+                    {% for item in same_category_products %}
+                        <li>{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="custom-no-items">同じカテゴリの商品はありません。</p>
+            {% endif %}
+
+            <h2>似た価格帯の商品</h2>
+            {% if similar_price_products %}
+                <ul class="custom-list">
+                    {% for item in similar_price_products %}
+                        <li>{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="custom-no-items">似た価格帯の商品はありません。</p>
+            {% endif %}
+        </div>
     </div>
+    <!-- ボタンの配置 -->
+    {% if user.is_authenticated %}
+    <div class="button-container">
+        <!-- 編集ボタン -->
+        <form action="{% url 'product_update' product.pk %}" method="GET">
+            <button type="submit" class="custom-button custom-button-edit">編集</button>
+        </form>
 
-    <!-- 同じカテゴリの商品 -->
-    <h2>同じカテゴリの商品</h2>
-    {% if same_category_products %}
-        <ul>
-            {% for item in same_category_products %}
-                <li>{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>同じカテゴリの商品はありません。</p>
-    {% endif %}
+        <!-- 削除ボタン -->
+        <form action="{% url 'product_delete' product.pk %}" method="GET">
+            <button type="submit" class="custom-button custom-button-delete">削除</button>
+        </form>
 
-    <!-- 似た価格帯の商品 -->
-    <h2>似た価格帯の商品</h2>
-    {% if similar_price_products %}
-        <ul>
-            {% for item in similar_price_products %}
-                <li>{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</li>
-            {% endfor %}
-        </ul>
+        <!-- お気に入り追加・解除ボタン -->
+        <form action="{% url 'toggle_favorite' product.pk %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="custom-button custom-button-favorite {% if product.id in favorites %}active{% endif %}">
+                {% if product.id in favorites %}お気に入り解除{% else %}お気に入り追加{% endif %}
+            </button>
+        </form>
+
+        <!-- カートに追加ボタン -->
+        <form id="add-to-cart-form" action="{% url 'add_to_cart' product.pk %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="custom-button custom-button-cart">カートに追加</button>
+        </form>
+    </div>
     {% else %}
-        <p>似た価格帯の商品はありません。</p>
+    <p class="custom-login-message">ログインして商品を編集・削除できます。</p>
     {% endif %}
+    <!-- メッセージ表示 -->
+    <div id="cart-message" class="custom-alert d-none" role="alert"></div>
 </div>
 
 {% endblock %}

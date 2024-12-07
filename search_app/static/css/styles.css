@@ -532,3 +532,143 @@ h1 {
 .btn-reset:hover {
     background-color: #777; /* ホバー時 */
 }
+
+/* カスタム画像スタイル */
+.custom-img {
+    display: block;
+    max-width: 450px; /* 最大幅を指定（150pxの3倍） */
+    max-height: 450px; /* 最大高さを指定（150pxの3倍） */
+    width: auto; /* 幅を自動調整 */
+    height: auto; /* 高さを自動調整 */
+    margin: 15px auto; /* 中央揃え */
+    object-fit: contain; /* 画像全体を表示して枠内に収める */
+    border: 1px solid #ccc; /* 枠線を追加 */
+    border-radius: 15px; /* 角を丸くする */
+}
+
+.custom-card-title {
+    text-align: center;
+}
+
+.custom-description {
+    text-align: center;
+}
+
+.custom-price {
+    text-align: center;
+}
+
+.custom-favorites {
+    text-align: center;
+}
+
+.custom-login-message {
+    text-align: center;
+}
+
+#cart-message {
+    text-align: center;
+}
+
+/* ボタンコンテナのスタイル */
+.button-container {
+    display: flex; /* 横並びに配置 */
+    justify-content: center; /* 中央寄せ */
+    gap: 5px; /* ボタン間の余白を狭める */
+    margin-top: 20px; /* 上部に余白を追加 */
+}
+
+/* ボタンのスタイル */
+.custom-button {
+    background-color: #555;
+    color: white;
+    border: none;
+    padding: 10px 15px; /* ボタンの内側余白を調整 */
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: auto; /* 横幅を自動調整 */
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+/* ボタンのホバースタイル */
+.custom-button:hover {
+    background-color: #555;
+}
+
+/* 特定のボタン色 */
+.custom-button-edit {
+    background-color: #777; /* 編集ボタン色 */
+}
+
+.custom-button-delete {
+    background-color: #777; /* 削除ボタン色 */
+}
+
+.custom-button-favorite {
+    background-color: #777; /* お気に入りボタン色 */
+}
+
+.custom-button-cart {
+    background-color: #777; /* カートボタン色 */
+}
+
+/* お気に入り解除ボタン */
+.custom-button-favorite.active {
+    background-color: #ff69b4; /* ピンク色 */
+}
+
+/* お気に入り解除ボタンのホバースタイル */
+.custom-button-favorite.active:hover {
+    background-color: #c71585; /* 濃いピンク */
+}
+
+/* 商品詳細部分と同じカテゴリ・似た価格帯の商品セクションを横並びにする */
+.custom-row {
+    display: flex;
+    justify-content: center; /* 横並びにして、センター揃えにする */
+    align-items: flex-start; /* 上揃えにして中央揃えのずれを解消 */
+    gap: 20px; /* 横の間隔 */
+    width: 100%; /* 横幅を100%にして、真ん中に配置 */
+}
+
+/* 各コラムの設定 */
+.custom-col {
+    flex: 1; /* 各コラムを同じ幅に */
+    max-width: 600px; /* コラムの最大幅を設定して、無限に広がらないように */
+}
+
+/* 商品詳細のセクション部分 */
+.custom-details {
+    flex: 2; /* 商品詳細部分を少し広くする */
+}
+
+/* 同じカテゴリ・似た価格帯の商品セクションを縦並びにする */
+.custom-products-row {
+    display: flex;
+    flex-direction: column; /* 縦並びに設定 */
+    gap: 20px; /* セクション間の間隔 */
+    margin-top: 30px; /* 上部の余白を調整 */
+}
+
+/* 商品リストのスタイル */
+.custom-list {
+    list-style: none;
+    padding: 0;
+}
+
+.custom-list li {
+    margin-bottom: 10px;
+}
+
+/* アイテムがない場合のメッセージ */
+.custom-no-items {
+    color: #777;
+    font-style: italic;
+}
+
+/* 同じカテゴリ・似た価格帯の商品セクションの上にマージンを追加 */
+.custom-col.custom-products-row {
+    margin-top: 55px; /* ここで上部の余白を調整 */
+}
