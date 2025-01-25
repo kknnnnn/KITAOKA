@@ -46,15 +46,70 @@
             <h3>合計金額　<span id="total-price">{{ total_price|floatformat:0|intcomma }}</span>円</h3>
         </div>
 
-            <!-- カートが空でない場合のみ表示 -->
-            <form action="{% url 'checkout' %}" method="get">
-                <button type="submit" class="custom-button">購入手続きへ進む</button>
-            </form> 
+        <!-- カートが空でない場合のみ表示 -->
+        <form action="{% url 'checkout' %}" method="get">
+            <button type="submit" class="custom-button">購入手続きへ進む</button>
+        </form> 
         </div>           
 
         {% else %}
             <p class="text-center">現在カートに商品はありません。</p>
         {% endif %}
     </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const quantityInputs = document.querySelectorAll('.quantity-input');
     
+            quantityInputs.forEach(function (input) {
+                input.addEventListener('change', function () {
+                    const productId = input.closest('tr').getAttribute('data-product-id');
+                    const quantity = input.value;
+                    const price = input.getAttribute('data-price');
+    
+                    if (quantity < 1) {
+                        input.value = 1;
+                    }
+    
+                    // 小計を再計算
+                    const subtotal = quantity * price;
+                    input.closest('tr').querySelector('.item-subtotal').textContent = `${subtotal.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}円`;
+    
+                    // 合計金額を更新
+                    updateTotalPrice();
+    
+                    // サーバーにAJAXリクエストを送信して数量を更新
+                    fetch("{% url 'update_quantity' product_id=0 %}".replace('0', productId), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                        body: JSON.stringify({ quantity: quantity })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert('数量の更新に失敗しました。');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('エラー:', error);
+                        alert('エラーが発生しました。');
+                    });
+                });
+            });
+    
+            function updateTotalPrice() {
+                let total = 0;
+                document.querySelectorAll('.item-subtotal').forEach(function (subtotalElement) {
+                    const subtotal = parseInt(subtotalElement.textContent.replace('円', '').replace(',', ''), 10);
+                    total += subtotal;
+                });
+                document.getElementById('total-price').textContent = total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+        });
+    </script>    
+
 {% endblock %}

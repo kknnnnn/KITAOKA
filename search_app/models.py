@@ -35,11 +35,18 @@ class Favorite(models.Model):
     
 class Purchase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product_name = models.CharField(max_length=255)
-    quantity = models.PositiveIntegerField()
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    purchased_at = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)  # 合計金額
+    purchased_at = models.DateTimeField(auto_now_add=True)  # 購入日時
 
     def __str__(self):
-        return f"{self.product_name} - {self.user.username}"
+        return f"Purchase {self.id} by {self.user.username} on {self.purchased_at.strftime('%Y-%m-%d %H:%M:%S')}"
+
+class PurchaseItem(models.Model):
+    purchase = models.ForeignKey(Purchase, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, default=81)
+    quantity = models.PositiveIntegerField()  # 購入数量
+    price = models.DecimalField(max_digits=10, decimal_places=2)  # 単価
+
+    def __str__(self):
+        return f"{self.product.name} - {self.quantity} pcs"
     

@@ -36,14 +36,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!isNaN(quantity) && quantity > 0) {
                 // 小計を更新
                 const newSubtotal = price * quantity;
-                subtotalElement.textContent = newSubtotal.toLocaleString(); // カンマ区切りのフォーマット
+                subtotalElement.textContent = newSubtotal.toLocaleString() + '円'; // 小計に「円」を追加
 
                 // 合計金額を再計算
                 let total = 0;
                 document.querySelectorAll('.item-subtotal').forEach(function (subtotal) {
-                    total += parseFloat(subtotal.textContent.replace(/,/g, ''));
+                    total += parseFloat(subtotal.textContent.replace(/[^0-9.-]+/g, '')); // 数値部分だけを取得
                 });
-                totalPriceElement.textContent = total.toLocaleString(); // カンマ区切りのフォーマット
+                totalPriceElement.textContent = total.toLocaleString() + '円'; // 合計金額に「円」を追加
 
                 // サーバーに数量更新を送信
                 const productId = row.dataset.productId;

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}購入詳細{% endblock %}
+{% block content %}
+
+<div class="text-center">
+    <h1>購入詳細</h1>
+
+    <h2>購入日時: {{ purchase.purchased_at|date:"Y年m月d日 H:i" }}</h2>
+
+    {% for item in purchase_items %}
+        <p>
+            商品名: <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a><br>
+            価格: {{ item.price|floatformat:0|intcomma }}円<br>
+            数量: {{ item.quantity }}<br>
+            小計: {{ item.subtotal|floatformat:0|intcomma }}円
+        </p>
+    {% endfor %}
+
+    <p><strong>合計金額: {{ purchase.total_price|floatformat:0|intcomma }}円</strong></p>
+</div>
+
+{% endblock %}

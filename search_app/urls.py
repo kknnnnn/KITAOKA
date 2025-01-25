@@ -20,6 +20,8 @@ urlpatterns = [
     path('update_quantity/<int:product_id>/', views.update_quantity, name='update_quantity'),
     path('checkout/', views.checkout, name='checkout'),
     path('purchase/', views.purchase_view, name='purchase'),
-    path('purchase-history/', views.purchase_history, name='purchase_history'),
+    path('purchase_history/', views.purchase_history, name='purchase_history'),
+    path('purchase_detail/<int:purchase_id>/', views.purchase_detail, name='purchase_detail'),
     path('purchase-complete/', views.purchase_complete_view, name='purchase_complete'),
+    path('update_quantity/<int:product_id>/', views.update_quantity, name='update_quantity'),
 ] 

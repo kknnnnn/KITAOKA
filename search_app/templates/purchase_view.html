@@ -1,29 +1,32 @@
 {% block title %}購入内容確認{% endblock %}
+
 {% block content %}
-
 <h1>購入内容確認</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>商品名</th>
-                <th>数量</th>
-                <th>小計</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for purchase in purchases %}
-            <tr>
-                <td>{{ purchase.product }}</td>
-                <td>{{ purchase.quantity }}</td>
-                <td>{{ purchase.subtotal }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 
-    <h2>合計金額: ¥{{ total_price }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>商品名</th>
+            <th>数量</th>
+            <th>小計</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in cart_items %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>¥{{ item.subtotal }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-    <a href="{% url 'checkout' %}">購入手続きへ進む</a>
+<h2>合計金額: ¥{{ total_price }}</h2>
 
-    {% endblock %}
-    
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">購入手続きへ進む</button>
+</form>
+
+{% endblock %}

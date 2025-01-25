@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Category, Favorite, Purchase
+from .models import Product, Category, Favorite, Purchase, PurchaseItem
 from .forms import ProductForm, SearchForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
@@ -12,6 +12,7 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from decimal import Decimal
 from django.db.models import Count
 from collections import defaultdict
+import json
 
 def product_create(request):
     if request.method == 'POST':
@@ -311,39 +312,35 @@ def remove_from_cart(request, product_id):
 
 def update_quantity(request, product_id):
     if request.method == 'POST':
-        # セッションからカートを取得
         cart = request.session.get('cart', {})
+        try:
+            # リクエストから数量を取得
+            data = json.loads(request.body)
+            quantity = int(data.get('quantity', 1))
 
-        # 商品がカートに存在するかチェック
-        if str(product_id) in cart:
-            try:
-                # フォームから数量を取得（空の場合は1）
-                quantity = int(request.POST.get('quantity', 1))
-                
-                # 数量が1未満の場合は1に設定
-                if quantity < 1:
-                    quantity = 1
-                
-                # カート内の商品数量を更新
+            if quantity < 1:
+                quantity = 1
+
+            # カートに商品の数量を更新
+            if str(product_id) in cart:
                 cart[str(product_id)]['quantity'] = quantity
-                
-                # セッションに更新したカートを保存
-                request.session['cart'] = cart
-                
-                # 成功メッセージ
-                messages.success(request, f"{cart[str(product_id)]['name']}の数量を変更しました。")
-            except ValueError:
-                # 数量が整数でない場合のエラーハンドリング
-                messages.error(request, "無効な数量が入力されました。")
-        else:
-            # 商品がカートにない場合のエラーメッセージ
-            messages.error(request, "カートにその商品はありません。")
-        
-        # カートページにリダイレクト
-        return redirect('cart')
-    
-    # POST以外のリクエストに対する処理
-    return redirect('cart')
+                request.session['cart'] = cart  # セッションを更新
+
+                # 小計と合計金額の再計算
+                subtotal = cart[str(product_id)]['price'] * quantity
+                total_price = sum(item['price'] * item['quantity'] for item in cart.values())
+
+                return JsonResponse({
+                    'success': True,
+                    'subtotal': subtotal,
+                    'total_price': total_price,
+                })
+            return JsonResponse({'success': False, 'message': '商品がカートにありません。'})
+
+        except ValueError:
+            return JsonResponse({'success': False, 'message': '無効な数量です。'})
+
+    return JsonResponse({'success': False, 'message': '無効なリクエストです。'})
     
 @login_required
 def checkout(request):
@@ -351,13 +348,24 @@ def checkout(request):
     cart = request.session.get('cart', {})
     
     if request.method == 'POST':
-        # 購入処理を実行（例: 購入情報をデータベースに保存）
+        # 合計金額を計算
+        total_price = sum(item['price'] * item['quantity'] for item in cart.values())
+
+        # Purchase モデルにデータを保存
+        purchase = Purchase.objects.create(
+            user=request.user,
+            total_price=total_price,
+        )
+        
+        # PurchaseItem モデルに各商品情報を保存
         for product_id, item in cart.items():
-            Purchase.objects.create(
-                user=request.user,
-                product_name=item['name'],  # 商品名
+            product = Product.objects.get(id=product_id)  # 商品を取得
+
+            PurchaseItem.objects.create(
+                purchase=purchase,
+                product=product,  # product_nameではなくproductを渡す
                 quantity=item['quantity'],  # 数量
-                total_price=item['price'] * item['quantity'],  # 小計（価格 * 数量）
+                price=item['price'],  # 単価
             )
         
         # カートをクリア
@@ -390,14 +398,28 @@ def checkout(request):
 
 @login_required
 def purchase_view(request):
+    # カート情報をセッションから取得
     cart = request.session.get('cart', {})
+    
+    # カートが空の場合はエラーメッセージを表示
     if not cart:
         messages.error(request, "カートが空です。")
         return redirect('cart')
 
     total_price = 0
+    cart_items = []  # カート内の商品情報を格納
+
+    # カート内の商品をリストに追加し、小計と合計金額を計算
     for product_id, item in cart.items():
-        total_price += item['price'] * item['quantity']
+        item_subtotal = item['price'] * item['quantity']  # 小計を計算
+        cart_items.append({
+            'name': item['name'],
+            'price': item['price'],
+            'quantity': item['quantity'],
+            'subtotal': item_subtotal,
+        })
+        total_price += item_subtotal  # 合計金額を計算
+
         # 購入履歴に保存
         Purchase.objects.create(
             user=request.user,
@@ -409,39 +431,37 @@ def purchase_view(request):
     # カートをクリア
     request.session['cart'] = {}
 
+    # 購入完了のメッセージ
     messages.success(request, "購入が完了しました！")
+    
     # 購入完了画面にリダイレクト
     return redirect('purchase_complete')
 
-@login_required
 def purchase_history(request):
-    # ユーザーの購入履歴を取得
     purchases = Purchase.objects.filter(user=request.user).order_by('-purchased_at')
-    
-    # 購入履歴がない場合のフラグを設定
-    no_purchases = not purchases.exists()
-
-    # 購入履歴を購入日時ごとにグループ化
-    grouped_purchases = defaultdict(list)
-    for purchase in purchases:
-        # 購入日でグループ化（購入日時を日付部分のみで比較する場合）
-        purchase_time = purchase.purchased_at.date()  # 日付部分のみ取得
-        grouped_purchases[purchase_time].append(purchase)
-
-    # 購入日時ごとの合計金額を計算
-    purchase_totals = {}
-    for purchase_time, purchases_in_time in grouped_purchases.items():
-        total = sum(purchase.total_price for purchase in purchases_in_time)
-        purchase_totals[purchase_time] = total
-
     context = {
         'purchases': purchases,
-        'no_purchases': no_purchases,
-        'grouped_purchases': grouped_purchases,
-        'purchase_totals': purchase_totals,  # 合計金額をコンテキストに追加
     }
-
     return render(request, 'purchase_history.html', context)
+
+def purchase_detail(request, purchase_id):
+    # 購入情報を取得
+    purchase = get_object_or_404(Purchase, id=purchase_id, user=request.user)
+    
+    # 購入アイテムを取得
+    purchase_items = PurchaseItem.objects.filter(purchase=purchase)
+    
+    # 各アイテムの小計を計算
+    for item in purchase_items:
+        item.subtotal = item.price * item.quantity  # 小計を計算してitemに追加
+    
+    # コンテキストに購入情報と購入アイテムを渡す
+    context = {
+        'purchase': purchase,
+        'purchase_items': purchase_items,
+    }
+    
+    return render(request, 'purchase_detail.html', context)
 
 @login_required
 def purchase_complete_view(request):

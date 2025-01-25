@@ -3,3 +3,6 @@ Django==5.1.2
 setuptools==75.1.0
 sqlparse==0.5.1
 psycopg
+-r requirements-dev.txt
+gunicorn
+psycopg2
