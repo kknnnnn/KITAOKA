@@ -8,13 +8,13 @@
     <form method="POST">
         {% csrf_token %}
         <div class="form-group">
-            <input type="text" name="username" id="username" required placeholder="ユーザー名">
+            <input type="text" name="username" id="id_username" required placeholder="ユーザー名" value="{{ form.username.value }}">
         </div>
         <div class="form-group">
-            <input type="password" name="password" id="password" required placeholder="パスワード">
+            <input type="password" name="password1" id="id_password1" required placeholder="パスワード">
         </div>
         <div class="form-group">
-            <input type="password" name="password2" id="password2" required placeholder="パスワード確認">
+            <input type="password" name="password2" id="id_password2" required placeholder="パスワード確認">
         </div>
         <button type="submit">登録</button>
     </form>

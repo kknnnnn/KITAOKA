@@ -13,6 +13,11 @@ def register_view(request):
             username = form.cleaned_data.get('username')
             messages.success(request, f'{username}さんが登録されました！')
             return redirect('login')
+        else:
+            # バリデーションエラーを表示
+            messages.error(request, '登録に失敗しました。')
+            # エラーをテンプレートに渡す
+            return render(request, 'registration/register.html', {'form': form})
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})

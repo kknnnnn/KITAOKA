@@ -504,7 +504,6 @@ h1 {
 /* ボタンを横並びにするための設定 */
 .button-group {
     display: flex; /* フレックスボックスで横並びに */
-    justify-content: space-between; /* ボタン間にスペースを均等に */
     gap: 10px; /* ボタン間の間隔 */
     margin-top: 10px; /* 上部に余白を追加 */
 }

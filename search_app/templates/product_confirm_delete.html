@@ -3,15 +3,17 @@
 {% block content %}
 {% load static %}
 
-<div class="container mt-5">
-    <h2>{{ product.name }}を削除しますか？</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">削除</button>
-        <form action="{% url 'product_detail' product.pk %}" method="GET" style="display:inline;">
-            <button type="submit" class="btn btn-secondary">キャンセル</button>
+<div class="margin-top">
+    <h2 class="text-center">{{ product.name }}を削除しますか？</h2>
+    <div class="button-container">
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="confirm-button delete-button">削除</button>
         </form>
-    </form>
+        <form action="{% url 'product_detail' product.pk %}" method="GET">
+            <button type="submit" class="confirm-button cancel-button">キャンセル</button>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

@@ -13,6 +13,9 @@ from decimal import Decimal
 from django.db.models import Count
 from collections import defaultdict
 import json
+import datetime
+
+now = datetime.datetime.now()
 
 def product_create(request):
     if request.method == 'POST':
