@@ -31,8 +31,11 @@
     </tbody>
 </table>
 
-<!-- 合計金額の表示 -->
-<div class="text-center"><p class="total-price">合計金額　<span>{{ total_price|floatformat:0|intcomma }}</span>円</p></div>
+<div class="text-center">
+    <p class="total-price">合計金額　<span>{{ total_price|floatformat:0|intcomma }}</span>円</p>
+    <!-- 購入金額の1%のポイント表示 -->
+    <p>獲得予定のポイント: <span id="earned-points"></span>ポイント</p>
+</div>
 
 <div class="buttons">
     <form action="{% url 'cart' %}" method="get" style="display:inline;">
@@ -43,5 +46,16 @@
         <button type="submit" class="custom-button success">購入する</button>
     </form>
 </div>
+
+<script>
+    // 合計金額を取得
+    const totalPrice = parseFloat("{{ total_price }}");
+
+    // 1% を計算して小数点以下切り捨て
+    const earnedPoints = Math.floor(totalPrice * 0.01);
+
+    // ポイントを表示
+    document.getElementById('earned-points').textContent = earnedPoints.toLocaleString();
+</script>
 
 {% endblock %}

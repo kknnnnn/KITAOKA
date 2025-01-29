@@ -6,6 +6,9 @@
 <div class="mypage">
     <h1>マイページ</h1>
     <p class="text-center">こんにちは、{{ user.username }}さん！</p>
+
+    <p class="text-center">現在のポイント: <strong>{{ point.balance }}</strong> pt</p>
+
     <div class="mypage-links">
         <a href="{% url 'favorites_list' %}" class="mypage-item">
             <img src="{% static 'images/IMG_5356.PNG' %}" alt="お気に入り" class="mypage-icon">

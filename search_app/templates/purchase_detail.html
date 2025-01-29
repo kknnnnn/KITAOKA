@@ -18,6 +18,18 @@
     {% endfor %}
 
     <p><strong>合計金額: {{ purchase.total_price|floatformat:0|intcomma }}円</strong></p>
+    <p>獲得ポイント: <span id="earned-points"></span>ポイント</p>
 </div>
+
+<script>
+    // 合計金額を取得
+    const totalPrice = parseFloat("{{ purchase.total_price }}");
+
+    // 1% を計算して小数点以下切り捨て
+    const earnedPoints = Math.floor(totalPrice * 0.01);
+
+    // ポイントを表示
+    document.getElementById('earned-points').textContent = earnedPoints.toLocaleString();
+</script>
 
 {% endblock %}

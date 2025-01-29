@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product, Category, Favorite, Purchase, PurchaseItem
+from .models import Product, Category, Favorite, Purchase, PurchaseItem, Point
 from .forms import ProductForm, SearchForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
@@ -181,15 +181,16 @@ def get_popular_products():
 
 @login_required
 def mypage_view(request):
-    # 現在のビューでは、ユーザー情報を表示する
-    # 新たに、購入履歴をデータベースから取得する機能を追加
-
-    # Purchaseモデルからログイン中のユーザーの購入履歴を取得し、
-    # 購入日時が新しい順（降順）に並び替え
+    # ユーザーの購入履歴を取得（購入日時が新しい順）
     purchases = Purchase.objects.filter(user=request.user).order_by('-purchased_at')
 
-    # テンプレートに購入履歴（purchases）を渡して、購入履歴を表示できるようにする
-    return render(request, 'mypage.html', {'purchases': purchases})
+    # ユーザーのポイント残高を取得、もし存在しなければ新しく作成
+    point, created = Point.objects.get_or_create(user=request.user)
+
+    return render(request, 'mypage.html', {
+        'purchases': purchases,
+        'point': point,  # ポイントをテンプレートに渡す
+    })
 
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = 'templates/password_change.html'  # カスタムテンプレート
@@ -351,50 +352,78 @@ def checkout(request):
     cart = request.session.get('cart', {})
     
     if request.method == 'POST':
+        # ユーザーのポイント情報を取得（Pointモデルに基づいて）
+        user_profile = get_object_or_404(Point, user=request.user)
+        
+        # 入力された利用ポイントを取得（負の値は許可しない）
+        use_points = int(request.POST.get('use_points', 0))
+        use_points = max(0, use_points)  # マイナス値防止
+
         # 合計金額を計算
         total_price = sum(item['price'] * item['quantity'] for item in cart.values())
 
-        # Purchase モデルにデータを保存
+        # 利用可能ポイントのチェック
+        if use_points > user_profile.balance:  # 'points' -> 'balance' に変更
+            messages.error(request, "利用ポイントが不足しています。")
+            return redirect('checkout')
+
+        # ポイント割引適用（合計金額を超えないようにする）
+        discount = min(use_points, total_price)
+        final_price = total_price - discount  # 割引後の価格
+        
+        # 購入データを作成
         purchase = Purchase.objects.create(
             user=request.user,
-            total_price=total_price,
+            total_price=final_price,
+            used_points=discount  # 使用したポイントを記録
         )
         
-        # PurchaseItem モデルに各商品情報を保存
+        # 商品ごとの購入データを作成
         for product_id, item in cart.items():
-            product = Product.objects.get(id=product_id)  # 商品を取得
+            product = Product.objects.get(id=product_id)
 
             PurchaseItem.objects.create(
                 purchase=purchase,
-                product=product,  # product_nameではなくproductを渡す
-                quantity=item['quantity'],  # 数量
-                price=item['price'],  # 単価
+                product=product,
+                quantity=item['quantity'],
+                price=item['price'],
             )
         
+        # ポイント処理
+        earned_points = int(final_price * 0.01)  # 購入金額の1%をポイント付与
+        user_profile.balance = user_profile.balance - discount + earned_points  # ポイント残高の更新
+        user_profile.save()
+
         # カートをクリア
         request.session['cart'] = {}
 
-        # 購入完了画面へリダイレクト
+        # 購入完了メッセージ
+        messages.success(request, f"購入が完了しました！ {earned_points} ポイントを獲得しました。")
+
         return redirect('purchase_complete')
     
-    # GETリクエスト: 購入確認画面を表示
-    cart_items = []  # 小計を計算するためのリスト
+    # GETリクエスト時の処理（購入確認画面）
+    cart_items = []
     total_price = 0
     
-    # 小計を計算
     for product_id, item in cart.items():
         item_subtotal = item['price'] * item['quantity']
         cart_items.append({
             'name': item['name'],
             'price': item['price'],
             'quantity': item['quantity'],
-            'subtotal': item_subtotal,  # 小計を追加
+            'subtotal': item_subtotal,
         })
-        total_price += item_subtotal  # 合計金額の計算
+        total_price += item_subtotal
     
+    # ユーザーの現在のポイントを取得
+    user_profile = get_object_or_404(Point, user=request.user)
+    user_points = user_profile.balance  # 'points' -> 'balance' に変更
+
     context = {
-        'cart_items': cart_items,  # 小計を含むカートの内容
-        'total_price': total_price,  # 合計金額
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'user_points': user_points,  # ユーザーのポイント情報
     }
     
     return render(request, 'checkout.html', context)
