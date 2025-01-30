@@ -76,15 +76,16 @@
         </select>
     </div>
     </form>
-    <div class="row">
+    
+    <div class="product-grid">
         {% for product in page_obj %}
-            <div class="col-md-4 mb-4">
-                <a href="{% url 'product_detail' product.pk %}" class="card-link text-decoration-none">
+            <div class="product-card">
+                <a href="{% url 'product_detail' product.pk %}" class="card-link">
                     <div class="card">
                         {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img">
                         {% else %}
-                            <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="card-img-top">
+                            <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="card-img">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ product.name }}</h5>
@@ -94,11 +95,9 @@
                 </a>
             </div>
         {% empty %}
-            <div class="col-12">
-                <p>商品がありません。</p>
-            </div>
+            <p>商品がありません。</p>
         {% endfor %}
-    </div>
+    </div>    
 
     <!-- ページネーション -->
     <div class="underline">

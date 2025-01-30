@@ -13,15 +13,15 @@
     </div>
     <!-- 商品リスト -->
     <div class="main-container">
-        <div class="row">
+        <div class="product-grid">
             {% for favorite in favorites %}
-                <div class="col-md-4 mb-4">
+                <div class="product-card">
                     <!-- 商品情報全体をクリック可能にするため、クリックイベントを設定 -->
                     <div class="card" onclick="window.location.href='{% url 'product_detail' favorite.product.pk %}'">
                         {% if favorite.product.image %}
-                            <img src="{{ favorite.product.image.url }}" alt="{{ favorite.product.name }}" class="card-img-top">
+                            <img src="{{ favorite.product.image.url }}" alt="{{ favorite.product.name }}" class="card-img">
                         {% else %}
-                            <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="card-img-top">
+                            <img src="{% static 'images/no_image_tate.jpg' %}" alt="No Image" class="card-img">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">
@@ -32,9 +32,7 @@
                     </div>
                 </div>
             {% empty %}
-                <div class="col-12">
-                    <p class="text-center">お気に入りはまだありません。</p>
-                </div>
+                <p class="text-center">お気に入りはまだありません。</p>
             {% endfor %}
         </div>
     </div>

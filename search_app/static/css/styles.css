@@ -73,34 +73,6 @@ footer {
     display: none;
 }
 
-.card {
-    width: 100%;
-    max-width: 18vw;
-    border: 2px solid #ddd;
-    border-radius: 30px;
-    overflow: hidden;
-    text-align: center;
-    padding: 0 40px; 
-    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1); /* 影を追加  */
-    transition: box-shadow 0.3s ease; /* ホバー時のアニメーション   */
-    margin-bottom: 30px;
-
-}
-
-.card:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* ホバー時に影を強調 */
-}
-
-.card-img-top {
-    width: 100%; /* カード幅に合わせる */
-    height: 250px; /* 高さを少し大きく */
-    object-fit: contain; /* 画像全体を表示 */
-    background-color: #f8f8f8; /* 背景色（画像がない部分） */
-    margin-top: 15px; /* 下方向に配置を調整 */
-    background-color: white;
-
-}
-
 .pagination {
     text-align: center;
 }
@@ -676,18 +648,119 @@ h1 {
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* 文字に影をつける */
 }
 
-@media (max-width: 600px) { /* スマホサイズ（1列） */
-    .col-md-4 {
-        flex: 0 0 100% !important;
-        max-width: 100% !important;
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 16px;
+}
+
+.product-card {
+    width: 100%;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    overflow: hidden;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1); /* 影を追加  */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    transition: box-shadow 0.3s ease; /* ホバー時のアニメーション   */
+    overflow: hidden;
+}
+
+.product-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* ホバー時に影を強調 */
+}
+
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+}
+
+.card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-img {
+    width: 100%; /* カード幅に合わせる */
+    height: 250px; /* 高さを少し大きく */
+    object-fit: contain; /* 画像全体を表示 */
+    margin-top: 15px; /* 下方向に配置を調整 */
+    background-color: white;
+}
+
+.card-body {
+    padding: 10px;
+    width: 100%;
+}
+
+.card-title {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1em;
+    color: #666;
+}
+
+.product-detail {
+    display: flex;
+    flex-wrap: wrap;  /* 小さい画面でも折り返しを許可 */
+    gap: 20px;        /* アイテム間の間隔 */
+    justify-content: center;  /* 横方向に中央揃え */
+    align-items: flex-start;  /* 縦方向は上揃え */
+}
+
+.product-card2 {
+    width: 100%;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    overflow: hidden;
+    text-align: center;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.product-img {
+    width: 300px;   /* 幅を固定 */
+    height: 300px;  /* 高さを固定 */
+    object-fit: contain; /* アスペクト比を保ちつつ、全体が収まるように */
+    background-color: #f0f0f0;  /* 背景色を設定（必要に応じて） */
+    background-color: white;
+}
+
+@media (max-width: 768px) {
+    .product-detail {
+        flex-direction: column;  /* 縦並びに変更 */
+        align-items: center;     /* 中央揃え（縦方向） */
+    }
+
+    /* 商品画像と関連商品セクションの幅を調整 */
+    .product-image, .product-related {
+        flex: 1 1 100%;  /* 幅を100%にして、縦並びに */
+        max-width: 100%; /* 幅を100%にする */
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);  /* 2列に変更 */
     }
 }
 
-@media (min-width: 601px) and (max-width: 991px) { /* タブレットサイズ（2列） */
-    .col-md-4 {
-        flex: 0 0 50% !important;
-        max-width: 50% !important;
+/* 更に小さいスクリーン（例：小さなスマホ）では1列表示 */
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: 1fr;  /* 1列に変更 */
     }
 }
-
-/* PCサイズ（992px以上）はBootstrapのデフォルトで3列のまま */
