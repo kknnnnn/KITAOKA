@@ -34,22 +34,34 @@
         <div class="custom-col custom-products-row">
             <h2>同じカテゴリの商品</h2>
             {% if same_category_products %}
+            <div class="underline">
                 <ul class="custom-list">
                     {% for item in same_category_products %}
-                        <li>{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</li>
+                        <li>
+                            <a href="{% url 'product_detail' item.id %}">
+                                {{ item.name }} - {{ item.price|floatformat:0|intcomma }}円
+                            </a>
+                        </li>
                     {% endfor %}
                 </ul>
+            </div>
             {% else %}
                 <p class="custom-no-items">同じカテゴリの商品はありません。</p>
             {% endif %}
 
             <h2>似た価格帯の商品</h2>
             {% if similar_price_products %}
+            <div class="underline">
                 <ul class="custom-list">
                     {% for item in similar_price_products %}
-                        <li>{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</li>
+                        <li>
+                            <a href="{% url 'product_detail' item.id %}">
+                                {{ item.name }} - {{ item.price|floatformat:0|intcomma }}円
+                            </a>
+                        </li>
                     {% endfor %}
                 </ul>
+            </div>
             {% else %}
                 <p class="custom-no-items">似た価格帯の商品はありません。</p>
             {% endif %}

@@ -509,7 +509,7 @@ h1 {
 }
 
 .btn-search, .btn-reset {
-    background-color: #555; /* 色 */
+    background-color: #777; /* 色 */
     color: white;
     border: none;
     padding: 8px 16px; /* 高さと幅を狭く調整 */
@@ -520,16 +520,8 @@ h1 {
     transition: background-color 0.3s ease;
 }
 
-.btn-search:hover {
-    background-color: #777; /* ホバー時 */
-}
-
-.btn-reset {
-    background-color: #555; /* リセットボタンの色 */
-}
-
-.btn-reset:hover {
-    background-color: #777; /* ホバー時 */
+.btn-search:hover,.btn-reset:hover {
+    background-color: #555; /* ホバー時 */
 }
 
 /* カスタム画像スタイル */
@@ -671,3 +663,31 @@ h1 {
 .custom-col.custom-products-row {
     margin-top: 55px; /* ここで上部の余白を調整 */
 }
+
+/* 通常時のリンクのスタイル */
+.underline a {
+    color: black; /* 通常時のリンクの色 */
+    text-decoration: none; /* 下線を消す */
+    transition: text-shadow 0.3s ease; /* ホバー時のアニメーション */
+}
+
+/* ホバー時のリンクのスタイル */
+.underline a:hover {
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* 文字に影をつける */
+}
+
+@media (max-width: 600px) { /* スマホサイズ（1列） */
+    .col-md-4 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 991px) { /* タブレットサイズ（2列） */
+    .col-md-4 {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+}
+
+/* PCサイズ（992px以上）はBootstrapのデフォルトで3列のまま */

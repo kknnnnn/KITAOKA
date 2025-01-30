@@ -9,7 +9,7 @@
     <h1>購入履歴</h1>
 
     {% if purchases %}
-        <div>
+        <div class="underline">
             {% for purchase in purchases %}
                 <p>
                     <a href="{% url 'purchase_detail' purchase.id %}">

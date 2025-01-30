@@ -45,9 +45,9 @@
         <h2>人気ランキング TOP3</h2>
         <ul style="list-style-type: none; padding: 0;">
             {% for product in popular_products %}
-                <li>
+                <li class="underline">
                     {{ forloop.counter }}位: 
-                    <a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a> 
+                        <a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a>                   
                     - お気に入り数: {{ product.favorites_count }}
                 </li>
             {% empty %}
@@ -99,9 +99,9 @@
             </div>
         {% endfor %}
     </div>
-    </div>
 
     <!-- ページネーション -->
+    <div class="underline">
     <div class="pagination mt-4">
         <span class="step-links">
             {% if page_obj.has_previous %}
@@ -116,6 +116,7 @@
                 <a href="?page={{ page_obj.paginator.num_pages }}&query={{ query }}&category={{ category_name }}&min_price={{ min_price }}&max_price={{ max_price }}&sort={{ sort_by }}" class="btn btn-link">最後</a>
             {% endif %}
         </span>
+    </div>
     </div>
 </div>
 

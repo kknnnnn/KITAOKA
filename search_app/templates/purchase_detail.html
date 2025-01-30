@@ -9,7 +9,7 @@
     <h2>購入日時: {{ purchase.purchased_at|date:"Y年m月d日 H:i" }}</h2>
 
     {% for item in purchase_items %}
-        <p>
+        <p class="underline">
             商品名: <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a><br>
             価格: {{ item.price|floatformat:0|intcomma }}円<br>
             数量: {{ item.quantity }}<br>
