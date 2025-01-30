@@ -446,7 +446,6 @@ button:hover, .btn-login:hover {
 
 /* ヘッダーh1タグの調整: ナビゲーションバーに隠れないように */
 h1 {
-    margin-top: 80px;  /* ナビゲーションバー分の余白を追加 */
     margin-bottom: 50px;  /* 表との間隔を広げる */
 }
 
@@ -578,14 +577,13 @@ h1 {
 }
 
 /* お気に入り解除ボタン */
-.custom-button-favorite.active {
-    background-color: #ff69b4; /* ピンク色 */
-}
-
-/* お気に入り解除ボタンのホバースタイル */
-.custom-button-favorite.active:hover {
-    background-color: #c71585; /* 濃いピンク */
-}
+.button-favorite.active {
+    background-color: #007bff;
+  }
+  
+  .button-favorite.active:hover {
+    background-color: #0056b3;
+  }
 
 /* 商品詳細部分と同じカテゴリ・似た価格帯の商品セクションを横並びにする */
 .custom-row {
@@ -741,7 +739,7 @@ h1 {
     background-color: white;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 820px) {
     .product-detail {
         flex-direction: column;  /* 縦並びに変更 */
         align-items: center;     /* 中央揃え（縦方向） */
@@ -762,5 +760,121 @@ h1 {
 @media (max-width: 480px) {
     .product-grid {
         grid-template-columns: 1fr;  /* 1列に変更 */
+    }
+    .navbar-item a {
+        font-size: 12px; /* 文字を少し小さく */
+    }
+    .mypage {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+        font-size: 12px;
+    }
+    .msmall {
+        font-size: 12px;
+    }
+    .login-container {
+        width: 80%; /* 幅を80%に調整 */
+        padding: 15px;
+    }
+
+    .login-container h1 {
+        font-size: 20px; /* タイトルを小さく */
+        margin-bottom: 15px;
+    }
+
+    .login-form {
+        gap: 10px; /* フォーム間隔を少し狭く */
+    }
+
+    .form-group input {
+        padding: 8px;
+        font-size: 14px; /* 入力フィールドの文字を小さく */
+    }
+
+    .btn-login {
+        padding: 8px;
+        font-size: 14px; /* ボタンの文字を小さく */
+    }
+    .form-container {
+        width: 80%; /* 幅を80%に調整 */
+        padding: 15px;
+    }
+
+    .form-container h1 {
+        font-size: 20px; /* タイトルを小さく */
+        margin-bottom: 15px;
+    }
+
+    .form-group input {
+        padding: 8px;
+        font-size: 14px; /* 入力フィールドの文字を小さく */
+    }
+
+    button {
+        padding: 8px;
+        font-size: 14px; /* ボタンの文字を小さく */
+    }
+    .katamari {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top: 10px;
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .katamari h2 {
+        font-size: 1.2rem;
+    }
+
+    .table {
+        font-size: 0.8rem;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .table .btn {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+
+    .table th,
+    .table td {
+        padding: 6px;
+    }
+
+    /* スマホ時にだけ「操作」列を表示 */
+    .remove-column {
+        display: table-cell;
+    }
+
+    /* PCの場合は「操作」列を非表示にする */
+    @media (min-width: 769px) {
+        .remove-column {
+            display: none;
+        }
+    }
+
+    .custom-table th, .custom-table td {
+        padding: 6px;
+        font-size: 0.9rem;
+    }
+
+    /* 合計金額、ポイント表示を小さく */
+    .total-price, .buttons {
+        font-size: 1rem;
+    }
+
+    /* ボタンのサイズも小さく */
+    .custom-button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    /* 見出しを小さく */
+    h1 {
+        font-size: 1.5rem;
     }
 }

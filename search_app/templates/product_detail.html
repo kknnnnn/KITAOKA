@@ -32,7 +32,9 @@
                 <div class="related-products">
                     <ul class="related-list">
                         {% for item in same_category_products %}
-                            <li><a href="{% url 'product_detail' item.id %}">{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</a></li>
+                            <li class="underline">
+                                <a href="{% url 'product_detail' item.id %}">{{ item.name }}</a> - {{ item.price|floatformat:0|intcomma }}円
+                            </li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -45,7 +47,9 @@
                 <div class="related-products">
                     <ul class="related-list">
                         {% for item in similar_price_products %}
-                            <li><a href="{% url 'product_detail' item.id %}">{{ item.name }} - {{ item.price|floatformat:0|intcomma }}円</a></li>
+                            <li class="underline">
+                                <a href="{% url 'product_detail' item.id %}">{{ item.name }}</a> - {{ item.price|floatformat:0|intcomma }}円
+                            </li>
                         {% endfor %}
                     </ul>
                 </div>

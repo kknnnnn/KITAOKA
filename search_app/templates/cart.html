@@ -14,6 +14,7 @@
                     <th>価格</th>
                     <th>数量</th>
                     <th>小計</th>
+                    <th class="remove-column">操作</th> <!-- 削除ボタンの列 -->
                 </tr>
             </thead>
             <tbody>
@@ -31,10 +32,10 @@
                                 data-price="{{ item.price|floatformat:0 }}">
                         </td>
                         <td class="item-subtotal">{{ item.subtotal|floatformat:0|intcomma }}円</td>
-                        <td>
+                        <td class="remove-btn">
                             <form action="{% url 'remove_from_cart' item.product_id %}" method="POST">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">削除</button>
+                                <button type="submit" class="btn btn-danger btn-sm">削除</button> <!-- 小さなボタン -->
                             </form>
                         </td>
                     </tr>

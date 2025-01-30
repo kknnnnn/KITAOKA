@@ -39,7 +39,7 @@
 
 <div class="buttons">
     <form action="{% url 'cart' %}" method="get" style="display:inline;">
-        <button type="submit" class="custom-button">カートに戻る</button>
+        <button type="submit" class="custom-button success">カートに戻る</button>
     </form>
     <form action="{% url 'checkout' %}" method="post" style="display:inline;">
         {% csrf_token %}
