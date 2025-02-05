@@ -5,7 +5,7 @@
 {% load humanize %}
 
 <div class="custom-container">
-    <div class="margin-top"><h1 class="custom-title">{{ product.name }}の詳細</h1></div>
+    <div class="margin-top"><h1 class="h1">{{ product.name }}の詳細</h1></div>
     
     <div class="product-detail">
         <!-- 商品画像部分 -->
@@ -80,7 +80,7 @@
         </form>
     </div>
     {% else %}
-    <div class="text-center"><p class="login-message">ログインして商品を編集・削除できます。</p></div>
+    <div class="text-center"><p class="login-message">ログインすると追加機能をご利用いただけます。</p></div>
     {% endif %}
     
     <div id="cart-message" class="alert d-none" role="alert"></div>

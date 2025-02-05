@@ -4,7 +4,7 @@
 {% block content %}
 
     <div class="cart">
-        <h2 class="text-center">ショッピングカート</h2>
+        <h2 class="h1">ショッピングカート</h2>
         <div class="katamari">
         {% if cart_items %}
         <table class="table">
@@ -14,7 +14,6 @@
                     <th>価格</th>
                     <th>数量</th>
                     <th>小計</th>
-                    <th class="remove-column">操作</th> <!-- 削除ボタンの列 -->
                 </tr>
             </thead>
             <tbody>
@@ -44,7 +43,7 @@
         </table>
         
         <div class="total-price">
-            <h3>合計金額　<span id="total-price">{{ total_price|floatformat:0|intcomma }}</span>円</h3>
+            <h3>合計金額: <span id="total-price">{{ total_price|floatformat:0|intcomma }}</span>円</h3>
         </div>
 
         <!-- カートが空でない場合のみ表示 -->

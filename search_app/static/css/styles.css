@@ -39,6 +39,11 @@ footer {
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* navbarと反対方向のシャドウ */
 }
 
+.h1 {
+    text-align: center;
+    font-size: 30px;
+}
+
 /* 右上に固定された検索アイコン */
 .search {
     position: fixed;
@@ -335,6 +340,7 @@ button:hover, .btn-login:hover {
 
 .katamari {
     position: absolute;
+    margin-top: -60px;
     top: 40%; /* 上に移動 */
     left: 50%;
     transform: translate(-50%, -50%);
@@ -739,6 +745,10 @@ h1 {
     background-color: white;
 }
 
+.product-card-body {
+    padding: 10px 10px;
+}
+
 @media (max-width: 820px) {
     .product-detail {
         flex-direction: column;  /* 縦並びに変更 */
@@ -753,6 +763,11 @@ h1 {
 
     .product-grid {
         grid-template-columns: repeat(2, 1fr);  /* 2列に変更 */
+    }
+
+    .katamari {
+        max-width: 80%;
+        margin-top: -150px;
     }
 }
 
@@ -822,6 +837,8 @@ h1 {
         width: 90%;
         margin-left: auto;
         margin-right: auto;
+        max-width: 80%;
+        margin-top: -15px;
     }
 
     .katamari h2 {
@@ -876,5 +893,17 @@ h1 {
     /* 見出しを小さく */
     h1 {
         font-size: 1.5rem;
+    }
+
+    .small-size {
+        margin-top: 53px;
+    }
+
+    .h1 {
+        font-size: 20px;
+    }
+
+    h2 {
+        font-size: 18px;
     }
 }
